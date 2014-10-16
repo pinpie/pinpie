@@ -49,13 +49,13 @@ Basic tags are:
 * Chunks &mdash; a pieces of plain text
 * Snippets &mdash; a pieces of php code to execute
 
-Read more in [docs/tags.md](tags readme).
+Read more in [tags readme](docs/tags.md).
 
 
 # Cache
 PinPIE provide clear and controllable automatic snippet caching.
 
-Read more in [docs/cache.md](cache readme).
+Read more in [cache readme](docs/cache.md).
 
 # Some PinPIE constants
 ## DS
