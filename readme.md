@@ -1,4 +1,4 @@
-pinpie
+PinPIE
 ======
 
 PinPIE &mdash; when PHP is enough.
@@ -9,12 +9,11 @@ PinPIE is lightweight php-based engine for small sites. All pages and URL handle
 # Disadvantages
  - Not an end-user product
 
-
 # Advantages
  - Lightweight
  - Tags: chunks, snippets, constants and static files
  - File-based content storage
-    - Edit your content using your favorite IDE or text editor with all that highlighting, autoformating, autosaving autouploading features and familiar hotkeys
+    - Edit your content using your favorite IDE or text editor with all that highlighting, autoformating, autosaving, autouploading features and familiar hotkeys
     - Full debug support including exact line numbers and IDE code execution controls
     - Accelerators support provides lightspeed response time 
     - Version control systems friendly &mdash; you can have versions of all your content to be safe and protected against loosing something while editing
@@ -32,6 +31,7 @@ PinPIE is lightweight php-based engine for small sites. All pages and URL handle
  - Optional automatic gz pre-compression for static content files (images, css, js, etc.)
  - Not an end-user product ;)
 
+
 # Quick overview
 PinPIE is designed to handle about 100-150 pages per second at cheap $5 VPS/VDS hosting. It can be used at shared hosting as well. 
 
@@ -39,17 +39,31 @@ PinPIE stores content in \*.php files, located in /pages folder. This files are 
 
 PinPIE uses tags. Tags have flexible caching mechanics, automatically refreshing expired tags, if its files or files of its children were changed.
 
-## File-based content storage
+# File-based content storage
 All content is stored in files. Pages are located at /pages folder, code snippets at /snippets folder, text chunks at /chunks. Nested folders are allowed.
 
+# Tags
+PinPIE have tag-based parser. Tag syntax is inspired by ModX tag system.
 
-## Some PinPIE constants
-### DS
+Basic tags are:
+* Chunks &mdash; a pieces of plain text
+* Snippets &mdash; a pieces of php code to execute
+
+Read more in [docs/tags.md](tags readme).
+
+
+# Cache
+PinPIE provide clear and controllable automatic snippet caching.
+
+Read more in [docs/cache.md](cache readme).
+
+# Some PinPIE constants
+## DS
 It's just short version of ```DIRECTORY_SEPARATOR```. Here is the code: ```define('DS', DIRECTORY_SEPARATOR);```
-### ROOT
+## ROOT
 This constant is expected to be root folder for PinPIE files and subfolders. It is set in ```/pinpie/pinpie.php``` and based on ```$_SERVER["SCRIPT_FILENAME"]```  value. Here is the code: ```define('ROOT', rtrim(str_replace('\\', '/', dirname($_SERVER["SCRIPT_FILENAME"])), DS));```
 
-## URL handling
+# URL handling
 PinPIE require all requests to be routed to index.php, where PinPIE entry point is included, and pages or URL hanlers to be located inside ```CFG::$pinpie['pages folder']```. By default its value is ```ROOT/pages``` (see [constants](#root)). The default page is located at path /pages/index.php.
 
 URL processing is quite simple. If requested URL is /about, then PinPIE will try to include ```/pages/about.php``` file. If it doesn't exist, path ```/pages/about/index.php``` will be checked.
