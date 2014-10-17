@@ -349,15 +349,6 @@ class PinPIE
       }
       $kill = [];
       $template = preg_replace_callback('/\[\[\*([^\[\]]+)\]\]/', function ($matches) use (&$tag, &$kill) {
-        /*var_dump($matches);
-        /*
-        array (size=2)
-        0 => string '[[*mheading]]' (length=13)
-        1 => string 'mheading' (length=8)
-        array (size=2)
-        0 => string '[[*mcontent]]' (length=13)
-        1 => string 'mcontent' (length=8)
-        */
         $r = '';
         foreach (['vars', 'parent vars'] as $storage) {
           ksort($tag[$storage]);

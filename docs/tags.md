@@ -14,6 +14,10 @@ Chunks could be located inside subfolders to keep it all more organised: ```[[so
 ### *Syntax: [[$snippet]]*
 Snippet is php file, that will be included, executed and parsed for other tags. Snippet tag starts with $ symbol: ```[[$some_snippet]]```.
 
+Snippet allow to transfer GET-like parameters inside its code. Just like in URL you can add variables to a snippet name: ```[[$snippet?foo=bar&cat=dog]]```. Inside snippet they will be available as variables ```$foo``` and ```$cat```. If variable or its value are changed, snippet is forced to be recached. So you don't have to worry about cache while in development.
+
+
+## Snippet caching
 Snippet output is cached forever by default. But you can prevent caching using exclamation point, or set cache expiration time (in seconds).
 
 ### Examples:  
@@ -21,15 +25,22 @@ Snippet output is cached forever by default. But you can prevent caching using e
  - ```[[!$some_snippet]]``` &mdash; caching disabled, snippet will be executed every time
  - ```[[3600$some_snippet]]``` &mdash; snippet is cached for one hour
  
-
+For further info please read [cache](cache.md) readme.
+ 
+## Tag templates
+To chunk and to snippet tags a template can be applied. Please read more in [template](template.md) readme.
 
 ## Variable placeholder
-### Syntax: [[*var]]
+### *Syntax: [[\*var]]*
 Every chunk, snippet or constant output can be put to the variable. This variable can be used in the page, in tags, or certainly in the template. Variable placeholder starts with asterisk. Here is syntax example: ```[[*var]]```
 
 This variables could be used in external template engine with help or your custom function. They are passed to function as associative array. See external template section.
 
 Variables are cached within its parents cache, so you don't have to worry about setting vars inside cacheable chunks and snippets. They will be cached and used outside this tags. See cache section. 
+
+Unused placeholders will be removed from output.
+
+There are reserved placeholders: ```[[*content]]``` for page output in template, and ```[[*tagcontent]]``` for tag templates. 
 
 ### Example №1:  
 To put a page title to a template having \<title\> tag, you can put the page title in variable using constant ```[var[=About]]``` in your page, and this code ```<title>[[*var]]</title>``` in your template.

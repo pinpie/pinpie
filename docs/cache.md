@@ -1,7 +1,7 @@
 # Cache
 PinPIE provide clear and controllable automatic snippet caching. Chunks are stored in \*.php files, and are mostly cached by acceleration software like APC, XCache, eAccelerator, etc.
 
-Each cache entry includes all file paths of used tags and their children. That means, all that files will be checked for existence and modification time (mtime). If any of them is changed after cache was created, then cache will be refreshed.
+Each cache entry includes all file paths of used tags and their children. That means, all that files will be checked for existence and modification time. If any of them is changed after cache was created, then cache will be refreshed.
 
 ## Usage
 Currently now caching have three options:
@@ -10,7 +10,7 @@ Currently now caching have three options:
  * [[**3600**$snippet]] &mdash; You can set cache expiration time in seconds.
  
 ## Separate caching
- Snippets are cached separately one from each other. If you have snippet with code ```<?php echo rand(0, 100);```, and use it many times in a page, you will get different numbers for each use.
+ Snippets are cached separately one from each other. If you have snippet with code ```<?php echo rand(1, 100);```, and use it many times in a page, you will get different numbers for each use.
  
 ### *Example №1*
 ```
@@ -57,7 +57,7 @@ Algorithm used to produce hash can be set in config in ```CFG::$pinpie['cache ha
 There are currently three cache storage options:
  * disabled &mdash; every snippet is forced to be executed each time
  * filecache &mdash; file-based storage (default)
- * memcache &mdash; memcache-based storage 
+ * memcached &mdash; memcached-based storage 
 
 Cache storage can be set in config by ```CFG::$pinpie['cache type']```. Default value is *filecache*. This variable defines what file of ```Cache``` class will be included. To clearly understand that see the code: ```include PINDIR . DS . 'classes' . DS . 'cache.class.' . basename(CFG::$pinpie['cache type']) . '.php';``` and that's all.
 
@@ -84,14 +84,29 @@ class Cache
 So any time PinPIE want to get cached data, it receives ```false```. This forces it to execute snipped anyway.
 
 ### Filecache
-Filecache uses ```/filecache/``` folder to store cache in files named by its hash. It is the simple, but very fast. Until your OS have **free** unused memory, you will have extra-fast caching, even faster than memcache. The disadvantage is that you have to clean cache by your own, because PinPIE can't.
+Filecache uses ```/filecache/``` folder to store cache in files named by its hash. It is the simple, but very fast. Until your OS have **free** unused memory, you will have extra-fast caching, even faster than memcached. The disadvantage is that you have to clean cache by your own, because PinPIE can't.
 
-Every time PinPIE generates new hash for tag, it will create new file. That is not a problem, because for most of the time the size of cache will be stable, and will grow only by newly added or edited snippets. Because hash is mtime-base, PinPIE can't find previous versions of cache files, and can't automatically delete them. 
+Every time PinPIE generates new hash for tag, it will create new file. That is not a problem, because for most of the time the size of cache will be stable, and will grow only by newly added or edited snippets. Because hash is based on file modification time, PinPIE can't find previous versions of cache files, and can't automatically delete them. 
 
 The advantages of this mode are:
 * Works everywhere. Only requirement is right to write to ```/filecache/``` folder.
 * Very fast.
 
+This type of cache is fast, because modern OS stores recent files content in free unused memory. All file access operations are highly optimized. So file cache performance is better than memcached at unix socket.
+
+### Memcached
+Memcached-based caching class uses Memcache object to store cache. Sure it have multiple servers support. Server pool is set in config var ```CFG::$pinpie['cache servers']``` as array or host and port pairs. Here is the code:
+```
+foreach (CFG::$pinpie['cache servers'] as $server) {
+  self::$mc->addServer($server['host'], $server['port']);
+}
+```
+Make sure you have set unique salt for every site in ```CFG::$random_stuff``` variable, because at shared hosting you may also have shared Memcached access.  
+### *Attention*
+Memcached cache class uses binary hashes, not hex-like as usual.
+
+### Custom classes
+You can create your own class to store cache at your favorite way. Just name it ```Cache```, put it into the file named by this model ```cache.class.YOURNAME.php```, put file to ```/pinpie/classes/``` folder and set in config  ```$pinpie['cache type'] = 'YOURNAME';```.
 
 ## Caching rules
 PinPIE gives you more control of caching process. All 404 pages have different URL, and that can produce to much unwanted cache, mostly never be used again. Or there could be some GET-params that doesn't affect a page, so you don't need to use them in hash generation, because that will produce additional cache.
