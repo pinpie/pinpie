@@ -1,0 +1,1 @@
+Hi! This is minimal site example.

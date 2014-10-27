@@ -320,17 +320,13 @@ class PinPIE
       self::error($tag, 'Template "' . $tag['template'] . '" not found');
       return false;
     }
-    //$template = self::readFile($tag['template filename']);//non executable reading
-    $template = self::fileExecute($tag['template filename']);
+    //$template = self::readFile($tag['template filename']); // non executable reading
+    $template = self::fileExecute($tag['template filename']); // executable reading
     if ($template === false) {
       return false;
     }
-    self::$times['Tag #' . $tag['index'] . ' before parsing constants'] = microtime(true);
     $template = self::parseConstants($template, $tag['index'], $priority);
-    self::$times['Tag #' . $tag['index'] . ' after parsing constants'] = microtime(true);
-    self::$times['Tag #' . $tag['index'] . ' before parsing tags'] = microtime(true);
     $template = self::parseTags($template, $tag['index'], $priority);
-    self::$times['Tag #' . $tag['index'] . ' after parsing tags'] = microtime(true);
     if (CFG::$pinpie['template function']) {
       self::$times['Tag #' . $tag['index'] . ' calling external template function'] = microtime(true);
       $f = CFG::$pinpie['template function']; //can't remebmer how to call a func by name from an array & m too lazy to google it, sorry

@@ -42,7 +42,7 @@ $pinpie = [
   'route to parent' => 1,
   'site url' => $_SERVER['SERVER_NAME'],
   'template function' => false,
-  'template clear vars after use' => true,
+  'template clear vars after use' => false,
 ];
 ```
 ### cache

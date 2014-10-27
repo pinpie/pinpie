@@ -58,7 +58,7 @@ class CFG
       'route to parent' => 1, //read doc. if exact file not found, instead of 404 trying to route request to nearest existing parent entry in url. Default is 1, it means PinPIE will handle "site.com/url" and "site.com/url/" as same page.
       'site url' => $_SERVER['SERVER_NAME'],
       'template function' => false,
-      'template clear vars after use' => true,
+      'template clear vars after use' => false,
     ];
     //Reading file and overwriting defaults
     $config = ROOT . DS . 'config' . DS . basename($_SERVER['SERVER_NAME']) . '.php';

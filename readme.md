@@ -40,7 +40,7 @@ PinPIE stores content in \*.php files, located in /pages folder. This files are 
 PinPIE uses tags. Tags have flexible caching mechanics, automatically refreshing expired tags, if its files or files of its children were changed.
 
 # Starting
-Folder /sources of this project contains required files and folders to make PinPIE work properly. Copy its contents to your project.
+Folder /sources of this project contains required files and folders to make PinPIE work properly. Copy its contents to your project. Also you have to create index.php to include PinPIE, default template and index page. You can find [minimal site example here](examples/minimal).
 
 ## Entry point
 PinPIE require to be included in main entry point of your project, and all requests have to be rerouted to that file. Generally, the main entry point for site code is ```ROOT/index.php```. This file require to have ```include 'pinpie/pinpie.php';``` line to start PinPIE working.
