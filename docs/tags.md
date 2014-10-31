@@ -119,3 +119,7 @@ This tags are replaced by corresponding HTML tags, where URL is leading to some 
 Static files could be located outside the site root folder. Set ```CFG::$pinpie['static folder']``` to static files root folder. Default value is ```ROOT``` (see [constants](#root)).
 
 For more detailed information about static tags, pre-minification and gzip pre-compression, please see [static readme](static.md).
+
+
+## Examples
+You can see some examples of tags usage in [tag examples](../examples/tags/readme.md).
