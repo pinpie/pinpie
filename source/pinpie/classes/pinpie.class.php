@@ -186,13 +186,15 @@ class PinPIE
   }
 
   private static function fileExecute($filename, $params = []) {
-    self::$times[$filename . ' executing'] = microtime(true);
+    static $i = 0;
+    $i++;
+    self::$times['executing ' . $filename . ' ' . $i] = microtime(true);
     if (is_string($params)) {
       parse_str($params);
     }
     ob_start();
     include $filename;
-    self::$times['executed ' . $filename] = microtime(true);
+    self::$times['executed ' . $filename . ' ' . $i] = microtime(true);
     return ob_get_clean();
   }
 
@@ -250,6 +252,7 @@ class PinPIE
         ) {
           $tag['action'] = 'processed';
           $content = self::renderTag($tag, $priority);
+          self::$times['Tag #' . $tag['index'] . ' ' . $tag['path'] . ' finished rendering'] = microtime(true);
           //у нас свежий контент, надо положить в кеш.
           //Глобал но кеш
           //почистим список файлов от пустых строк
@@ -261,6 +264,7 @@ class PinPIE
             // echo '[CANT SAVE]';
             self::error($tag, 'can`t put content to cache');
           }
+          self::$times['Tag #' . $tag['index'] . ' ' . $tag['path'] . ' finished caching'] = microtime(true);
         } else {
           //обновлять не надо, файл старый, берём из кеша и усё
           $tag['action'] = 'from cache';
@@ -305,9 +309,9 @@ class PinPIE
   private static function renderTag(&$tag, $priority) {
     $content = self::parseTags(self::getContent($tag), $tag['index']);
     $content = self::parseConstants($content, $tag['index']);
-    //Apply minitemplate to content
+    //Apply template to tag content
     if (!empty($tag['template'])) {
-      $tag['vars'][0]['tagcontent'][] = $content;
+      $tag['vars'][0]['content'][] = $content;
       $content = self::applyTemplate($tag, $priority);
     }
     return $content;
@@ -335,13 +339,9 @@ class PinPIE
     } else {
       self::$times['Tag #' . $tag['index'] . ' begin processing template'] = microtime(true);
       //have to do this to use vars on the same tag it was created
-      foreach (['content', 'tagcontent'] as $var) {
-        if (isset($tag['vars'][0]) AND isset($tag['vars'][0][$var]) AND strpos($template, '[[*' . $var . ']]') !== false) {
-          $template = str_replace('[[*' . $var . ']]', implode('', $tag['vars'][0][$var]), $template);
-          if (CFG::$pinpie['template clear vars after use']) {
-            unset($tag['vars'][0][$var]);
-          }
-        }
+      if (isset($tag['vars'][0]) AND isset($tag['vars'][0]['content']) AND strpos($template, '[[*content]]') !== false) {
+        $template = str_replace('[[*content]]', implode('', $tag['vars'][0]['content']), $template);
+        unset($tag['vars'][0]['content']);
       }
       $kill = [];
       $template = preg_replace_callback('/\[\[\*([^\[\]]+)\]\]/', function ($matches) use (&$tag, &$kill) {

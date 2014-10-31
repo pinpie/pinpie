@@ -144,3 +144,6 @@ $databases['main'] = [
  * It's accessible through CFG::$conf. You can store here any config settings you want.
  */
 $conf['any settings'] = 'some';
+
+
+$pinpie['cache rules'][200]['ignore query params'][] = 'XDEBUG_SESSION_START';

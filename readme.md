@@ -69,15 +69,15 @@ PinPIE provide clear and controllable automatic snippet caching.
 Read more in [cache readme](docs/cache.md).
 
 # Some PinPIE constants
-## DS
+### DS
 It's just short version of ```DIRECTORY_SEPARATOR```. Here is the code: ```define('DS', DIRECTORY_SEPARATOR);```
-## ROOT
+### ROOT
 This constant is expected to be root folder for PinPIE files and subfolders. It is set in ```/pinpie/pinpie.php``` and based on ```$_SERVER["SCRIPT_FILENAME"]```  value. Here is the code: ```define('ROOT', rtrim(str_replace('\\', '/', dirname($_SERVER["SCRIPT_FILENAME"])), DS));```
 
-## PIN_TIME_START
+### PIN_TIME_START
 This constant is defined just when ```/pinpie/pinpie.php``` is included. Code: ```define('PIN_TIME_START', microtime(true));```
 
-## PIN_MEMORY_START
+### PIN_MEMORY_START
 Defined just after PIN_TIME_START. Code: ```define('PIN_MEMORY_START', memory_get_usage());```
 
 # URL handling
