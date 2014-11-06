@@ -8,7 +8,7 @@ Chunk is plain text located in file in /chunks folder. This code ```[[some_chunk
 
 Chunks could be located inside subfolders to keep it all more organised: ```[[some/chunk]]``` or ```[[some/long/path/chunk]]```.
 
-You can see some examples of tags usage in [tag examples](../examples/tags/readme.md).
+You can see some examples of tags usage in [tag examples](../examples/tags).
 
 
 ## Snippet
@@ -17,7 +17,7 @@ Snippet is php file, that will be included, executed and parsed for other tags. 
 
 Snippet allow to transfer GET-like parameters inside its code. Just like in URL you can add variables to a snippet name: ```[[$snippet?foo=bar&cat=dog]]```. Inside snippet they will be available as variables ```$foo``` and ```$cat```. If variable or its value are changed, snippet is forced to be recached. So you don't have to worry about cache while in development.
 
-You can see some examples of tags usage in [tag examples](../examples/tags/readme.md).
+You can see some examples of tags usage in [tag examples](../examples/tags).
 
 
 ## Snippet caching
@@ -32,7 +32,7 @@ For further info please read [cache](cache.md) readme.
  
 ## Tag templates
 To chunk and to snippet tags a template can be applied. Please read more in [template readme](template.md).
-You can see some examples of tags templates usage in [tag examples](../examples/tags/readme.md).
+You can see some examples of tags templates usage in [tag examples](../examples/tags).
 
 ## Variable placeholder
 ### *Syntax: [[\*var]]*
@@ -85,7 +85,7 @@ will provide you the same HTML code:
 <span>pinpie</span>
 ```   
    
-You can see some examples of tags usage in [tag examples](../examples/tags/readme.md).
+You can see some examples of tags usage in [tag examples](../examples/tags).
 
 
 ## Constant
@@ -102,7 +102,7 @@ multiline
 text]]
 ```
 
-You can see some examples of tags usage in [tag examples](../examples/tags/readme.md).
+You can see some examples of tags usage in [tag examples](../examples/tags).
 
 ## Command
 ### *Syntax: [[@template=main]]*
@@ -126,4 +126,4 @@ For more detailed information about static tags, pre-minification and gzip pre-c
 
 
 ## Examples
-You can see some examples of tags usage in [tag examples](../examples/tags/readme.md).
+You can see some examples of tags usage in [tag examples](../examples/tags).
