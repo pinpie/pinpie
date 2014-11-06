@@ -97,7 +97,12 @@ In most cases static files like js, css or images are located in the same folder
 
 It's highly recommended to read more about static files tags in [static readme](static.md).
 
+### template function
+This function will be called when template have to be applied. Read more in [template readme](template.md#external-template-engines).
+
 ## Other settings
+
+
 
 ### Custom configuration
 You can store any other settings in ```$conf``` array, if you want. It will be available globally in ```CFG::$conf```.   

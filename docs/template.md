@@ -72,9 +72,14 @@ Template code:
 PinPIE will replace ```[[*title]]``` tag in template with a content of variable.
 
 ## Tag templates
-PinPIE allow to apply template to a tag output as well. The template for tag will require ```[[*tagcontent]]``` placeholder. Tag template have to be located in ```/templates/``` folder.
+PinPIE allow to apply template to a tag output as well. The template for tag will require the same ```[[*content]]``` placeholder. The tag template have to be located in the ```/templates/``` folder.
 
-To apply template to chunk or snippet output you need just put its name before second closing bracket: ```[[$snippet]template]```
+To apply a template to the chunk or snippet output you need just put its name before second closing bracket: ```[[$snippet]template]```
 
 ### Example
-To wrap snippet output to a ```div``` you need create template named e.g. "wrap" with code: ```<div>[[*tagcontent]]</div>```. And now you can apply this template to a snippet like this: ```[[$snippet]wrap]``` with code e.g. ```<?php echo rand(1,100);``` will output ```<div>42</div>```.
+To wrap snippet output to a ```div``` you need create template named e.g. "wrap" with code: ```<div>[[*content]]</div>```. And now you can apply this template to a snippet like this: ```[[$snippet]wrap]``` with code e.g. ```<?php echo rand(1,100);``` will output ```<div>42</div>```.
+
+## External template engines
+PinPIE allow to call a user function when template have to be applied. The name of the function to call can be set in [config](config.md#template-function). Function have to take two arguments: tag parameters array and the parsed template. 
+  
+

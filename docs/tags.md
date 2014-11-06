@@ -8,6 +8,7 @@ Chunk is plain text located in file in /chunks folder. This code ```[[some_chunk
 
 Chunks could be located inside subfolders to keep it all more organised: ```[[some/chunk]]``` or ```[[some/long/path/chunk]]```.
 
+You can see some examples of tags usage in [tag examples](../examples/tags/readme.md).
 
 
 ## Snippet
@@ -15,6 +16,8 @@ Chunks could be located inside subfolders to keep it all more organised: ```[[so
 Snippet is php file, that will be included, executed and parsed for other tags. Snippet tag starts with $ symbol: ```[[$some_snippet]]```.
 
 Snippet allow to transfer GET-like parameters inside its code. Just like in URL you can add variables to a snippet name: ```[[$snippet?foo=bar&cat=dog]]```. Inside snippet they will be available as variables ```$foo``` and ```$cat```. If variable or its value are changed, snippet is forced to be recached. So you don't have to worry about cache while in development.
+
+You can see some examples of tags usage in [tag examples](../examples/tags/readme.md).
 
 
 ## Snippet caching
@@ -29,6 +32,7 @@ For further info please read [cache](cache.md) readme.
  
 ## Tag templates
 To chunk and to snippet tags a template can be applied. Please read more in [template readme](template.md).
+You can see some examples of tags templates usage in [tag examples](../examples/tags/readme.md).
 
 ## Variable placeholder
 ### *Syntax: [[\*var]]*
@@ -40,7 +44,7 @@ Variables are cached within its parents cache, so you don't have to worry about 
 
 Unused placeholders will be removed from output.
 
-There are reserved placeholders: ```[[*content]]``` for page output in template, and ```[[*tagcontent]]``` for tag templates. 
+There is reserved placeholder ```[[*content]]``` for page or tag output in template.
 
 ### Example №1:  
 To put a page title to a template having \<title\> tag, you can put the page title in variable using constant ```[var[=About]]``` in your page, and this code ```<title>[[*var]]</title>``` in your template.
@@ -81,7 +85,7 @@ will provide you the same HTML code:
 <span>pinpie</span>
 ```   
    
-
+You can see some examples of tags usage in [tag examples](../examples/tags/readme.md).
 
 
 ## Constant
@@ -98,7 +102,7 @@ multiline
 text]]
 ```
 
-
+You can see some examples of tags usage in [tag examples](../examples/tags/readme.md).
 
 ## Command
 ### *Syntax: [[@template=main]]*
