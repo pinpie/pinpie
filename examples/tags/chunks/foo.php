@@ -1,1 +1,0 @@
-This is chunk "foo" contents. PHP code is not executed. <?php echo 'Hi!'; ?>

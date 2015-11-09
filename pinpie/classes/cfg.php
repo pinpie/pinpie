@@ -1,9 +1,8 @@
 <?php
 
-class CFG
-{
+class CFG {
 
-  //descriptions are in ::ReadConf() func
+  // descriptions are in ::ReadConf() func
   public static
     $random_stuff = null,
     $conf = null,
@@ -18,19 +17,20 @@ class CFG
     $showtime = null,
     $route_to_parent = null,
     $log = null,
-    $pinpie = null;
+    $pinpie = null,
+    $debug = null;
 
   /**
    * Internal method to read configuration file.
    */
-  public static function ReadConf()
-  {
+  public static function ReadConf() {
     $pinpie = []; //settings for PinPIE
     $conf = []; //you can put some custom setting here
     $databases = []; //to store database settings
     $static_servers = []; //list here static content servers addresses if you want to use them
     $showtime = false; //show page generating time
     $random_stuff = false; //very important to generate long random string for every your site. Please, press as many keys on your keyboard as you can. Or just use online password generators.
+    $debug = false; //enables PinPIE::report() output. Use it to enable your own debug mode. Globally available through CFG::$debug.
 
     //Loading defaults
     $pinpie = [
@@ -59,6 +59,9 @@ class CFG
       'site url' => $_SERVER['SERVER_NAME'],
       'template function' => false,
       'template clear vars after use' => false,
+      'working folder' => ROOT,
+      'preinclude' => ROOT . DS . 'preinclude.php',
+      'postinclude' => ROOT . DS . 'postinclude.php',
     ];
     //Reading file and overwriting defaults
     $config = ROOT . DS . 'config' . DS . basename($_SERVER['SERVER_NAME']) . '.php';
@@ -75,6 +78,7 @@ class CFG
     self::$showtime = $showtime;
     self::$random_stuff = $random_stuff;
     self::$pinpie = $pinpie;
+    self::$debug = $debug;
   }
 
 }

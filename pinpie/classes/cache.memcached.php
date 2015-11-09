@@ -1,5 +1,8 @@
 <?php
 
+namespace PinPIE;
+use CFG;
+
 class Cache
 {
 
@@ -19,9 +22,6 @@ class Cache
         return false;
       }
     }
-    // debug mode
-    //    $r = self::$mc->get($hash);
-    //    return $r;
     return self::$mc->get($hash);
   }
 

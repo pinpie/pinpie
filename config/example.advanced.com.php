@@ -18,7 +18,7 @@ $pinpie['site url'] = 'site.com';
 
 /*
  * Codepage
- * Define the codepage here and fill free to use in anywhere. See preincludes.php in Examples project.
+ * Define the codepage here and fill free to use in anywhere. See example.preincludes.php.
  */
 $pinpie['codepage'] = 'utf-8';
 
@@ -58,7 +58,7 @@ $pinpie['route to parent'] = 99;
  * This defines what cache class file will be used.
  * There are three cache classes available now:
  *  - disabled - a fake cache
- *  - filecache - fastest if there is enough RAM caching, using files. The OS will handle all IO itself, caching all in free RAM (yellow bar in htop at Linux). So until you have free RAM, it is the faster way.
+ *  - filecache - fastest if there is enough RAM caching, using files. The OS will handle all IO itself, caching all in free RAM (yellow bar in htop at Linux). So until you have free RAM
  *  - memcached - using fast and distributed well-known Memcached caching system. Cache servers have to be defined.
  */
 $pinpie['cache type'] = 'memcached';
@@ -144,6 +144,3 @@ $databases['main'] = [
  * It's accessible through CFG::$conf. You can store here any config settings you want.
  */
 $conf['any settings'] = 'some';
-
-
-$pinpie['cache rules'][200]['ignore query params'][] = 'XDEBUG_SESSION_START';

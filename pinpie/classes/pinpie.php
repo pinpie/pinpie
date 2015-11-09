@@ -1,20 +1,22 @@
 <?php
 
+use PinPIE\Cache;
+
 class PinPIE
 {
-  private static $currentTag = null;
+  public static $currentTag = null;
   private static $depth = 0, $totaltagsprocessed = 0;
   private static $path = [];
   public static
     //Template. Use false to prevent template usage, to output json or any other raw data.
-    $template = 'default';
+      $template = 'default';
   private static $type_to_execute = [
-    '' => false,
-    '$' => true
+      '' => false,
+      '$' => true
   ];
   private static $type_to_folder = [
-    '' => 'chunks',
-    '$' => 'snippets'
+      '' => 'chunks',
+      '$' => 'snippets'
   ];
   public static $times = [];
   private static $tags = [], $constants = [], $statics = [], $commands = [];
@@ -23,7 +25,12 @@ class PinPIE
 
   public static $document = null;
 
+  private static $initDone = false;
   public static function Init() {
+    if (static::$initDone){
+      return true;
+    }
+    static::$initDone = true;
     $url = parse_url($_SERVER['REQUEST_URI']);
     self::$document = self::getDocument($url['path']);
     if (self::$document === false) {
@@ -32,21 +39,21 @@ class PinPIE
       self::$document = trim(CFG::$pinpie['page not found'], DS);
     }
     self::$tags = [
-      0 => [
-        'index' => 0,
-        'depth' => 0,
-        'name' => 'PAGE',
-        'fulltag' => 'PAGE',
-        'parent' => false,
-        'parents' => [],
-        'type' => '',
-        'cacheble parents' => false,
-        'cache' => false,
-        'vars' => [],
-        'parent vars' => [],
-        'files' => [],
-        'children' => [],
-      ],
+        0 => [
+            'index' => 0,
+            'depth' => 0,
+            'name' => 'PAGE',
+            'fulltag' => 'PAGE',
+            'parent' => false,
+            'parents' => [],
+            'type' => '',
+            'cacheble parents' => false,
+            'cache' => false,
+            'vars' => [],
+            'parent vars' => [],
+            'files' => [],
+            'children' => [],
+        ],
     ];
     self::$currentTag = 0;
     ob_start();
@@ -114,6 +121,8 @@ class PinPIE
     if (!$path OR !$folder) {
       return false;
     }
+    $path = str_replace('\\', '/', $path);
+    $folder = str_replace('\\', '/', $folder);
     $folderRealpath = realpath($folder);
     $pathRealath = realpath($path);
     if ($pathRealath === false OR $folderRealpath === false) {
@@ -127,8 +136,8 @@ class PinPIE
   }
 
   /**
-   * @param $name Template variable name
-   * @param $content Content to put in template variable.
+   * @param String $name Template variable name
+   * @param String $content Content to put in template variable.
    */
   public static function putVar($name, $content) {
     static::$tags[static::$currentTag]['vars'][0][$name][] = $content;
@@ -228,10 +237,10 @@ class PinPIE
     $tag['filename'] = self::getTagFilepath($tag);
     self::$times['Tag #' . $tag['index'] . ' ' . $tag['path'] . ' started processing'] = microtime(true);
     try {
-      ThrowOnFalse($tag['filename'], 'File does\'t exist in expected folder');
-      ThrowOnFalse(file_exists($tag['filename']), 'File not found at ' . $tag['filename']);
-      ThrowOnTrue(self::$depth > 100, 'Maximum recursion level achieved');
-      ThrowOnTrue(self::$totaltagsprocessed > 9999, 'Over nine thousands tags processed. It\'s time to stop.');
+      throwOnFalse($tag['filename'], 'File does\'t exist in expected folder');
+      throwOnFalse(file_exists($tag['filename']), 'File not found at ' . $tag['filename']);
+      throwOnTrue(self::$depth > 100, 'Maximum recursion level achieved');
+      throwOnTrue(self::$totaltagsprocessed > 9999, 'Over nine thousands tags processed. It\'s time to stop.');
       $tag['filetime'] = filemtime($tag['filename']);
       if (!$tag['cache'] OR $tag['cacheble parents']) {
         //стоит запрет кеширования или не нужно кешировать, если один из родителей будет закеширован
@@ -245,10 +254,10 @@ class PinPIE
         //если вернулся фалс, значит либо нету, либо время у файла новее, либо отвалился кеш =)
         if (
           //не удалось прочесть из кеша или
-          $cached === false
-          OR
-          //время кеширования истекло или есть файлы, которые изменились
-          self::checkFiles($tag, $cached) === true
+            $cached === false
+            OR
+            //время кеширования истекло или есть файлы, которые изменились
+            self::checkFiles($tag, $cached) === true
         ) {
           $tag['action'] = 'processed';
           $content = self::renderTag($tag, $priority);
@@ -271,7 +280,6 @@ class PinPIE
           $tag['vars'] = $cached['vars'];
           $content = $cached['content'];
         }
-
       }
     } catch (Exception $e) {
       self::error($tag, $e->getMessage());
@@ -281,7 +289,7 @@ class PinPIE
     error: " . $e->getMessage());
     }
     $tag['content'] = $content;
-    $tag['processing time'] = microtime(true) - $time_start;
+    $tag['time']['processing'] = microtime(true) - $time_start;
     self::$times['Tag #' . $tag['index'] . ' ' . $tag['path'] . ' finished processing'] = microtime(true);
     return $content;
   }
@@ -374,8 +382,11 @@ class PinPIE
     //return self::parseStatic($template, $tag);
   }
 
-  private static function parseStatic($content) {
-    self::$times['begin parsing statics'] = microtime(true);
+  private static $parseStaticCallCounter = 0;
+
+  public static function parseStatic($content) {
+    self::$parseStaticCallCounter++;
+    self::$times['#' . self::$parseStaticCallCounter . ' begin parsing statics'] = microtime(true);
     $matches = array();
     preg_match_all('/\[\[(!*)%([^\]]+)\]([^\[\]]*)\]/U', $content, $matches);
     $tags = [];
@@ -395,10 +406,8 @@ class PinPIE
         $fulltags[] = $matches[0][$k];
       }
     }
-
-
     foreach ($tags as $tag) {
-      $path = StatiCon::getStaticPath($tag['path'], $tag['type']);
+      $path = PinPIE\StatiCon::getStaticPath($tag['path'], $tag['type']);
       if ($path !== false) {
         $path .= (!empty($tag['query']) ? '?' . $tag['query'] : '');
         if (!$tag['onlyPath']) {
@@ -419,7 +428,7 @@ class PinPIE
       $replaces[] = $tag['content'];
       self::$statics[] = $tag;
     }
-    self::$times['finished parsing statics'] = microtime(true);
+    self::$times['#' . self::$parseStaticCallCounter . ' finished parsing statics'] = microtime(true);
     return str_replace($fulltags, $replaces, $content);
   }
 
@@ -443,19 +452,29 @@ class PinPIE
     return '/' . implode('/', array_merge(self::$path, [$tag['type'] . $tag['name']]));
   }
 
-  public static function parseTags($content, $parent = false, $priority = 10000) {
+  public static function parseString($content, $parseStatic = true) {
+    $content = self::parseTags($content);
+    $content = self::parseConstants($content, static::$currentTag);
+    if ($parseStatic) {
+      $content = self::parseStatic($content);
+    }
+    //self::$currentTag = 0;
+    return $content;
+  }
+
+  private static function parseTags($content, $parent = false, $priority = 10000) {
     self::$depth++;
     if ($parent !== false AND isset(self::$tags[$parent])) {
       self::$path[] = self::$tags[$parent]['type'] . self::$tags[$parent]['name'];
     } else {
       $parent = self::$currentTag;
     }
-    $s = preg_replace_callback('/\[\s*([^\[\]]*)\s*\[\s*(!*)(\d*)([@#$%]?)([^!\d@#$%*=][^\[\]]+)\s*\]\s*([^\[\]]*)\s*\](\r\n|\n\r|\r\n)*?/smuUS',
-      function ($matches) use ($parent, $priority) {
-        $matches += ['', '', '', '', '', '', '', '',]; //defaults =) to prevent warning on last *
-        return self::createTag($matches, $parent, $priority);
-      }
-      , $content);
+    $s = preg_replace_callback('/\[\s*([^\[\]]*)\s*\[\s*(!*)(\d*)([@#$%]?)([^\[!\d@#$%*=][^\[\]]+)\s*\]\s*([^\[\]]*)\s*\](\r\n|\n\r|\r\n)*?/smuUS',
+        function ($matches) use ($parent, $priority) {
+          $matches += ['', '', '', '', '', '', '', '',]; //defaults =) to prevent warning on last *
+          return self::createTag($matches, $parent, $priority);
+        }
+        , $content);
     array_pop(self::$path);
     self::$depth--;
     return $s;
@@ -480,6 +499,30 @@ class PinPIE
       7 => \n\r
     */
     //var_dump($matches);
+
+    $tag = [
+        'time' => ['start' => microtime(true), 'end' => (float)0, 'total' => (float)0, 'processing' => (float)0,],
+        'fulltag' => $matches[0],
+        'cache' => ($matches[2] == '!' ? false : true),
+        'cachetime' => ($matches[3] == '' ? false : $matches[3]),
+        'cacheble parents' => false,
+        'depth' => self::$depth,
+        'type' => $matches[4],
+        'name' => '',
+        'params' => '',
+        'value' => '',
+        'delayed' => ($matches[1] == '' ? false : $matches[1]),
+        'template' => ($matches[6] == '' ? false : $matches[6]),
+        'template filename' => '',
+        'filename' => '',
+        'parent' => $parent,
+        'parents' => [],
+        'children' => [],
+        'vars' => [],
+        'parent vars' => [],
+        'files' => [], //to prevent duplication, filenames are stored as KEYS
+    ];
+
     $params = null;
     $value = null;
     $name = explode('?', $matches[5], 2);
@@ -488,34 +531,16 @@ class PinPIE
       $params = $name[1];
     }
     $name = $name[0];
-
     //extracting direct value [[tag=value]]
     $name = explode('=', $name, 2);
     if (isset($name[1])) {
       $value = $name[1];
     }
     $name = $name[0];
-    $tag = [
-      'fulltag' => $matches[0],
-      'cache' => ($matches[2] == '!' ? false : true),
-      'cachetime' => ($matches[3] == '' ? false : $matches[3]),
-      'cacheble parents' => false,
-      'depth' => self::$depth,
-      'type' => $matches[4],
-      'name' => $name,
-      'params' => $params,
-      'value' => $value,
-      'delayed' => ($matches[1] == '' ? false : $matches[1]),
-      'template' => ($matches[6] == '' ? false : $matches[6]),
-      'template filename' => '',
-      'filename' => '',
-      'parent' => $parent,
-      'parents' => [],
-      'children' => [],
-      'vars' => [],
-      'parent vars' => [],
-      'files' => [], //to prevent duplication, filenames are stored as KEYS
-    ];
+
+    $tag['name'] = $name;
+    $tag['params'] = $params;
+    $tag['value'] = $value;
     $tag['index'] = count(self::$tags);
     self::$tags[] = $tag;
     self::$currentTag = $tag['index'];
@@ -578,6 +603,8 @@ class PinPIE
     //Transfer all vars and files to parent
     self::transferVars($tag);
     self::transferFiles($tag);
+    $tag['time']['end'] = microtime(true);
+    $tag['time']['total'] = $tag['time']['end'] - $tag['time']['start'];
     //возвращаемое пишется в текст содержиого тега или страницы.
     return $r;
   }
@@ -627,7 +654,9 @@ class PinPIE
   }
 
   public static function report() {
-    if (!empty(CFG::$pinpie['report password'])) {
+    if (!CFG::$debug OR empty(CFG::$pinpie['report password'])) {
+      return false;
+    } else {
       if (!isset($_GET['PINPIEREPORT']) OR $_GET['PINPIEREPORT'] !== CFG::$pinpie['report password']) {
         return false;
       }
@@ -651,7 +680,10 @@ class PinPIE
     echo '$tags:<br>';
     echo '<pre>';
     foreach (self::$tags as $tag) {
-      echo str_repeat('  ', $tag['depth']) . $tag['index'] . ' ' . trim($tag['fulltag'], " \n\r\t") . "\n";
+      if (empty($tag['time'])) {
+        $tag['time'] = ['total' => 0];
+      }
+      echo str_repeat('  ', $tag['depth']) . $tag['index'] . ' ' . number_format(round($tag['time']['total'] * 1000, 2), 2) . 'ms ' . trim($tag['fulltag'], " \n\r\t") . "\n";
     }
     echo '</pre><br>';
     foreach (self::$tags as &$tag) {
@@ -669,42 +701,40 @@ class PinPIE
     return true;
   }
 
-  private static function parseConstants($content, $parent, $priority = 10000) {
+  private static function parseConstants($content, $parent = 0, $priority = 10000) {
     return preg_replace_callback('/\[\s*([^\[\]]*)\s*\[=([^\[\]]*)\]\]/smuUS',
-      function ($matches) use ($parent, $priority) {
-        $matches += ['', '', '',]; //defaults =) to prevent warning on last *
-        if ($matches[1] === '') {
-          return $matches[2];
+        function ($matches) use ($parent, $priority) {
+          $matches += ['', '', '',]; //defaults =) to prevent warning on last *
+          if ($matches[1] === '') {
+            return $matches[2];
+          }
+          if (!isset(self::$tags[$parent]['vars'][$priority])) {
+            self::$tags[$parent]['vars'][$priority] = [];
+          }
+          if (!isset(self::$tags[$parent]['vars'][$priority][$matches[1]])) {
+            self::$tags[$parent]['vars'][$priority][$matches[1]] = [];
+          }
+          self::$tags[$parent]['vars'][$priority][$matches[1]][] = $matches[2];
+          return '';
         }
-        if (!isset(self::$tags[$parent]['vars'][$priority])) {
-          self::$tags[$parent]['vars'][$priority] = [];
-        }
-        if (!isset(self::$tags[$parent]['vars'][$priority][$matches[1]])) {
-          self::$tags[$parent]['vars'][$priority][$matches[1]] = [];
-        }
-        self::$tags[$parent]['vars'][$priority][$matches[1]][] = $matches[2];
-        return '';
-      }
-      , $content);
+        , $content);
   }
 
 
-  public static function Postincludes() {
+  public static function render() {
     self::$times['Postincludes'] = microtime(true);
     $content = ob_get_clean();
     self::$times['getting content after'] = microtime(true);
     if (self::$template === false) {
       //can be used for ajax output
       echo $content;
-      exit();
+      return true;
     }
     //парсим содержимое страницы
     $content = self::parseTags($content, 0);
     self::$tags[0]['template'] = self::$template;
     //парсим константы, какие найдем
     $content = self::parseConstants($content, 0);
-    //кладем в отложенный вывод
-    //self::putDelayed('*content', $content);
     self::$tags[0]['vars'][0]['content'][] = $content; //zero for higher priority
     self::$times['page parsed'] = microtime(true);
     $content = self::applyTemplate(self::$tags[0]);
@@ -714,9 +744,9 @@ class PinPIE
     //выводим
     echo $content;
     self::$times['echo $content'] = microtime(true);
+    return true;
   }
-
 
 }
 
-PinPIE::Init();
+

@@ -1,0 +1,2 @@
+[[#template=plain]]
+Hello world!

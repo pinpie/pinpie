@@ -1,5 +1,7 @@
 <?php
 
+namespace PinPIE;
+
 class Cache
 {
 

@@ -1,6 +1,10 @@
 <?php
 
-class Cache {
+namespace PinPIE;
+use CFG;
+
+class Cache
+{
   private static $path = '';
   private static $ok = false;
 
@@ -8,14 +12,13 @@ class Cache {
     if (self::$ok === true) {
       return true;
     }
-    self::$path = ROOT . DS . 'filecache' . DS;
+    self::$path = CFG::$pinpie['working folder'] . DS . 'filecache' . DS;
     if (!is_dir(self::$path)) {
-      mkdir(self::$path);
+      mkdir(self::$path, 0664, true);
     }
     if (touch(self::$path . 'test')) {
       self::$ok = true;
     }
-    //self::$ok = true;
     return self::$ok;
   }
 
@@ -28,7 +31,7 @@ class Cache {
     if (!file_exists($fp)) {
       return false;
     }
-    $content = file_get_contents(self::$path . $hash);
+    $content = file_get_contents($fp);
     if ($content === false) {
       return false;
     }
@@ -45,7 +48,7 @@ class Cache {
       return false;
     }
     $content = serialize($content);
-    return file_put_contents(self::$path . $hash, $content);
+    return file_put_contents($fp, $content);
   }
 
 }
