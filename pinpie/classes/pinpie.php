@@ -602,10 +602,7 @@ class PinPIE {
   }
 
   private static function processConstant(&$tag) {
-    $content = $tag['name'];
-    if (!empty($tag['value'])) {
-      $content .= '=' . $tag['value'];
-    }
+    $content = $tag['fullname'];
     if (!empty($tag['template'])) {
       $tag['vars'][0]['content'][] = $content;
       $content = static::applyTemplate($tag);
@@ -702,6 +699,7 @@ class PinPIE {
 
     $params = null;
     $value = null;
+    $tag['fullname'] = $matches[4];
     $name = explode('?', $matches[4], 2);
     // extracting params [[tag?params]]
     if (isset($name[1])) {

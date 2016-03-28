@@ -1,6 +1,6 @@
 <?php
 define('PIN_TIME_START', microtime(true));
-define('PIN_MEMORY_START', memory_get_peak_usage(true));
+define('PIN_MEMORY_START', memory_get_peak_usage());
 define('DS', DIRECTORY_SEPARATOR);
 define('ROOT', rtrim(str_replace('\\', '/', dirname($_SERVER["SCRIPT_FILENAME"])), DS));
 define('PINDIR', rtrim(str_replace('\\', '/', __DIR__), DS));
