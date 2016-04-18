@@ -474,66 +474,12 @@ class PinPIE {
 
   public static $parseStaticCallCounter = 0;
 
-  /** @deprecated */
-  private static function parseStatic($content) {
-    static::$parseStaticCallCounter++;
-    static::$times['#' . static::$parseStaticCallCounter . ' begin parsing statics'] = microtime(true);
-    $matches = array();
-    preg_match_all('/\[\[(!*)%([^\]]+)\]([^\[\]]*)\]/U', $content, $matches);
-    $tags = [];
-    $replaces = [];
-    $fulltags = [];
-    foreach ($matches[2] as $k => $v) {
-      if (!isset($tags[$v])) { //check if we already parsed this static file before
-        $tag = [
-          'type' => '',
-          'onlyPath' => ($matches[1][$k] == '!' ? true : false),
-          'path' => '',
-          'query' => '',
-          'fulltag' => $matches[0][$k],
-          'content' => $matches[0][$k],
-        ];
-        $s = explode('=', $v, 2);
-        if (isset($s[1])) {
-          $pu = parse_url($s[1]);
-          $tag['path'] = (isset($pu['path']) ? $pu['path'] : '');
-          $tag['query'] = (isset($pu['query']) ? $pu['query'] : '');
-        }
-        $tag['type'] = $s[0];
-        $tags[$v] = $tag;
-        $fulltags[] = $matches[0][$k];
-      }
-    }
-    foreach ($tags as $tag) {
-      $path = PinPIE\StatiCon::getStaticUrl($tag['path'], $tag['type']);
-      if ($path !== false) {
-        $path .= (!empty($tag['query']) ? '?' . $tag['query'] : '');
-        if (!$tag['onlyPath']) {
-          switch ($tag['type']) {
-            case 'js':
-              $path = "<script type='text/javascript' src='$path'></script>";
-              break;
-            case 'css':
-              $path = "<link rel='stylesheet' type='text/css' href='$path'>";
-              break;
-            case 'img':
-              $path = "<img src='$path'>";
-              break;
-          }
-        }
-        $tag['content'] = $path;
-      }
-      $replaces[] = $tag['content'];
-    }
-    static::$times['#' . static::$parseStaticCallCounter . ' finished parsing statics'] = microtime(true);
-    return str_replace($fulltags, $replaces, $content);
-  }
-
   private static function processStatic(&$tag) {
     static::$parseStaticCallCounter++;
     static::$times['#' . static::$parseStaticCallCounter . ' begin processing static ' . $tag['name'] . ': ' . $tag['value']] = microtime(true);
     $static = \PinPIE\StatiCon::createStatic($tag);
     static::$times['#' . static::$parseStaticCallCounter . ' created static ' . $tag['name'] . ': ' . $tag['value']] = microtime(true);
+    $tag['filename'] = $static['file path'];
     if (empty(CFG::$pinpie['static draw function'])) {
       if ($tag['cachetime']) {
         /* exclamation mark AKA cachetime = return path only */
@@ -566,7 +512,6 @@ class PinPIE {
     }
     static::$times['#' . static::$parseStaticCallCounter . ' finished processing static ' . $tag['name'] . ': ' . $tag['value']] = microtime(true);
     return $tag['content'];
-
   }
 
   private static function drawStatic($static) {
@@ -912,8 +857,8 @@ class PinPIE {
     return static::$cache->get($hash);
   }
 
-  public static function cacheSet($hash, $content, $time = false) {
-    return static::$cache->set($hash, $content, $time);
+  public static function cacheSet($hash, $data, $time = false) {
+    return static::$cache->set($hash, $data, $time);
   }
 
   public static function injectCacher($cacher) {
