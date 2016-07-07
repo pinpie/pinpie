@@ -426,7 +426,7 @@ class PinPIE {
 
     $kill = [];
     $depth = 100;
-    $content = static::replacePlaceholdersRecurcive($content, $tag, $kill, $depth);
+    $content = static::replacePlaceholdersRecursive($content, $tag, $kill, $depth);
 
     unset($tag['local vars']);
     foreach ($kill as $storage => $priorities) {
@@ -440,29 +440,37 @@ class PinPIE {
     return $content;
   }
 
-  private static function replacePlaceholdersRecurcive($content, &$tag, &$kill, &$depth) {
+  private static function replacePlaceholdersRecursive($content, &$tag, &$kill, &$depth) {
     $depth--;
     if (!$depth) {
-      static::error($tag, 'Max depth reached while calling replacePlaceholdersRecurcive()');
+      static::error($tag, 'Max depth reached while calling replacePlaceholdersRecursive()');
       return '';
     }
     $content = preg_replace_callback('/\[\[\*([^\[\]]+)\]\]/',
       function ($matches) use (&$tag, &$kill, &$depth) {
-        if (CFG::$debug) {
-          $r = $matches[0];
-        } else {
-          $r = '';
+        $r = '';
+        if (empty($matches[1])) {
+          return $r;
         }
+        $placeholder = explode('=', $matches[1], 2);
+        if (!empty($placeholder[1])) {
+          $r = $placeholder[1];
+        }
+        $placeholder = $placeholder[0];
+        if (CFG::$debug) {
+          $r = '[[*' . $placeholder . ']]' . $r;
+        }
+
         foreach (['vars', 'parent vars', 'local vars'] as $storage) {
           if (empty($tag[$storage])) {
             continue;
           }
           ksort($tag[$storage]);
           foreach ($tag[$storage] as $priority => $vars) {
-            if (isset($vars[$matches[1]])) {
-              $r .= static::replacePlaceholdersRecurcive(implode('', $vars[$matches[1]]), $tag, $kill, $depth);
+            if (isset($vars[$placeholder])) {
+              $r = static::replacePlaceholdersRecursive(implode('', $vars[$placeholder]), $tag, $kill, $depth);
               if (CFG::$pinpie['template clear vars after use']) {
-                $kill[$storage][$priority][] = $matches[1];
+                $kill[$storage][$priority][] = $placeholder;
               }
             }
           }
