@@ -16,9 +16,6 @@ if (CFG::$pinpie['static dimensions types']) {
   include PINDIR . DS . 'classes' . DS . 'fastimage.php';
 }
 
-// include PINDIR . DS . 'classes' . DS . 'cache.' . basename(CFG::$pinpie['cache type']) . '.php';
-
-
 PinPIE::$times['PinPIE classes are loaded'] = microtime(true);
 PinPIE::Init();
 

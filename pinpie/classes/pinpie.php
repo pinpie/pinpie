@@ -159,6 +159,20 @@ class PinPIE {
     static::$tags[static::$currentTag]['vars'][0][$name][] = $content;
   }
 
+  public static function killVar($name) {
+    $tag = &static::$tags[static::$currentTag];
+    foreach (['vars', 'parent vars', 'local vars'] as $storage) {
+      if (empty($tag[$storage])) {
+        continue;
+      }
+      foreach ($tag[$storage] as $priority => &$vars) {
+        if (isset($vars[$name])) {
+          unset($vars[$name]);
+        }
+      }
+    }
+  }
+
   private static $hashQuery = false;
 
   private static function hash(&$tag) {
@@ -475,6 +489,7 @@ class PinPIE {
             }
           }
         }
+
         return $r;
       }, $content);
     return $content;
