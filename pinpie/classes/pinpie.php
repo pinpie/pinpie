@@ -159,20 +159,6 @@ class PinPIE {
     static::$tags[static::$currentTag]['vars'][0][$name][] = $content;
   }
 
-  public static function killVar($name) {
-    $tag = &static::$tags[static::$currentTag];
-    foreach (['vars', 'parent vars', 'local vars'] as $storage) {
-      if (empty($tag[$storage])) {
-        continue;
-      }
-      foreach ($tag[$storage] as $priority => &$vars) {
-        if (isset($vars[$name])) {
-          unset($vars[$name]);
-        }
-      }
-    }
-  }
-
   private static $hashQuery = false;
 
   private static function hash(&$tag) {
@@ -608,7 +594,7 @@ class PinPIE {
             , $content);
         } while ($found AND $i < 10);*/
 
-    $content = preg_replace_callback('/\[([^\[\]]*)\[([!\d]*)([@#$%=]?)([^\[!\d@#$%*=][^\[\]]+)\]([^\[\]]*)\](\r\n|\n\r|\r\n)*?/smuUS',
+    $content = preg_replace_callback('/\[([^\[\]]*)\[([!\d]*)([@#$%=]?)([^\[!@#$%*=][^\[\]]+)\]([^\[\]]*)\](\r\n|\n\r|\r\n)*?/smuUS',
       function ($matches) use ($parent, $priority) {
         $matches += ['', '', '', '', '', '', '', '',]; //defaults =) to prevent warning on last (enter)* detector
         return static::createTag($matches, $parent, $priority);
