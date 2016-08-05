@@ -594,7 +594,32 @@ class PinPIE {
             , $content);
         } while ($found AND $i < 10);*/
 
-    $content = preg_replace_callback('/\[([^\[\]]*)\[([!\d]*)([@#$%=]?)([^\[!@#$%*=][^\[\]]+)\]([^\[\]]*)\](\r\n|\n\r|\r\n)*?/smuUS',
+    $content = preg_replace_callback('/
+    
+    \[
+    
+    ([^\[\]]*?)
+    
+    \[
+    
+    ([!\d]*)
+    
+    ([@#$%=]?)
+    
+    (
+      (?!\*)
+      [^\[\]]+?
+    )
+    
+    \]
+    
+    ([^\[\]]*?)
+    
+    \]    
+    
+    (\r\n|\n\r|\r\n)*
+    
+    /xsmuS',
       function ($matches) use ($parent, $priority) {
         $matches += ['', '', '', '', '', '', '', '',]; //defaults =) to prevent warning on last (enter)* detector
         return static::createTag($matches, $parent, $priority);
