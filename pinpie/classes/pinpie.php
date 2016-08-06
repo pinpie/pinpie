@@ -579,49 +579,22 @@ class PinPIE {
     } else {
       $parent = static::$currentTag;
     }
-
-    /*    $i = 0;
-        do {
-          $i++;
-          $found = false;
-          $content = static::expandVars(static::$tags[$parent], $content);
-          $content = preg_replace_callback('/\[([^\[\]]*)\[([!\d]*)([@#$%]?)([^\[!\d@#$%*=][^\[\]]+)\]([^\[\]]*)\](\r\n|\n\r|\r\n)*?/smuUS',
-            function ($matches) use ($i, &$found, $parent, $priority) {
-              $found = true;
-              $matches += ['', '', '', '', '', '', '', '',]; //defaults =) to prevent warning on last *
-              return static::createTag($matches, $parent, $priority);
-            }
-            , $content);
-        } while ($found AND $i < 10);*/
-
-    $content = preg_replace_callback('/
-    
-    \[
-    
-    ([^\[\]]*?)
-    
-    \[
-    
-    ([!\d]*)
-    
-    ([@#$%=]?)
-    
-    (
-      (?!\*)
-      [^\[\]]+?
-    )
-    
-    \]
-    
-    ([^\[\]]*?)
-    
-    \]    
-    
-    (\r\n|\n\r|\r\n)*
-    
-    /xsmuS',
+    $content = preg_replace_callback(/** @lang RegExp */
+      '/
+        \[
+        ([^\[\]]*?)
+        \[
+        ([!\d]*)
+        ([@#$%=]?)
+        (?!\*)
+        ([^\[\]]+?)
+        \]
+        ([^\[\]]*?)
+        \]    
+        (\r\n|\n\r|\r|\n)*
+      /xsmuS',
       function ($matches) use ($parent, $priority) {
-        $matches += ['', '', '', '', '', '', '', '',]; //defaults =) to prevent warning on last (enter)* detector
+        $matches += ['', '', '', '', '', '', '']; //defaults =) to prevent warning on last (enter)* detector
         return static::createTag($matches, $parent, $priority);
       }
       , $content);
@@ -637,16 +610,18 @@ class PinPIE {
    * @return bool|mixed|string
    */
   private static function createTag($matches, $parent, $priority) {
-    //return preg_replace_callback('/\[([\*{1,2}\w]*)\[(!*)(\d*)([@#$%*]?)([^!\d@#$%*=].+)\](\w*)\]([\n\r])/sU', function ($matches) use ($parent) {
-    /*array (size=6)
-      0 => string '[[!$ajaja]]' (length=11)
-      1 => string '**heading'
-      2 => string '!' (length=1)
-      3 => string '' (length=0)
-      4 => string '$' (length=1)
-      5 => string 'ajaja' (length=5)
-      6 => string 'minitemplate'
-      7 => \n\r
+    /*
+     * Tag with new line after tag
+      array (size=8)
+        0 => string '[header[!$snippet]template]
+      ' (length=28) <-- New line
+        1 => string 'header' (length=6) <-- placeholder to put tag output in
+        2 => string '!' (length=1) <-- cache forever
+        3 => string '$' (length=1) <-- it is snippet
+        4 => string 'snippet' (length=7) <-- snippet name
+        5 => string 'template' (length=8) <-- template
+        6 => string '
+      ' (length=1) <-- New line
     */
 
     $tag = [
@@ -749,7 +724,7 @@ class PinPIE {
         PinPIE::logit('Unknown tag found. tag:' . $tag['fulltag'] . ' in ' . static::getTagPath($tag));
     }
     if ($r !== '') {
-      $r .= $matches[7];
+      $r .= $matches[6];
     }
     if ($tag['delayed']) {
       if (!isset($tag['vars'][$priority])) {
