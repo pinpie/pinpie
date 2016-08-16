@@ -261,7 +261,7 @@ class PinPIE {
     return $path;
   }
 
-  private static function processTag(&$tag, $priority) {
+  private static function processSnippet(&$tag) {
     $time_start = microtime(true);
     static::$totaltagsprocessed++;
     $content = '';
@@ -279,7 +279,7 @@ class PinPIE {
       if (!$tag['cachetime'] OR $tag['cacheble parents']) {
         //стоит запрет кеширования или не нужно кешировать, если один из родителей будет закеширован
         $tag['action'] = 'processed nocache';
-        $content = static::renderTag($tag, $priority);
+        $content = static::renderTag($tag);
       } else {
         $tag['hash'] = static::hash($tag);
         //кешируем или читаем из кеша
@@ -294,7 +294,7 @@ class PinPIE {
           static::checkFiles($tag, $cached) === true
         ) {
           $tag['action'] = 'processed';
-          $content = static::renderTag($tag, $priority);
+          $content = static::renderTag($tag);
           static::$times['Tag #' . $tag['index'] . ' ' . $tag['path'] . ' finished rendering'] = microtime(true);
           //у нас свежий контент, надо положить в кеш.
           //Глобал но кеш
@@ -362,18 +362,18 @@ class PinPIE {
     return false;
   }
 
-  private static function renderTag(&$tag, $priority) {
+  private static function renderTag(&$tag) {
     $content = static::getContent($tag);
     $content = static::parseTags($content, $tag['index']);
     //Apply template to tag content
     if (!empty($tag['template'])) {
       $tag['vars'][0]['content'][] = $content;
-      $content = static::applyTemplate($tag, $priority);
+      $content = static::applyTemplate($tag);
     }
     return $content;
   }
 
-  private static function applyTemplate(&$tag, $priority = 1000) {
+  private static function applyTemplate(&$tag) {
     static::$times['Tag #' . $tag['index'] . ' begin parsing template'] = microtime(true);
     $tag['template filename'] = rtrim(CFG::$pinpie['templates folder'], '\\/') . DS . trim($tag['template'], '\\/') . '.php';
     if (CFG::$pinpie['templates realpath check']) {
@@ -393,7 +393,7 @@ class PinPIE {
         $template = '[[*content]]';
       }
     }
-    $template = static::parseTags($template, $tag['index'], $priority);
+    $template = static::parseTags($template, $tag['index'], $tag['priority']);
     if (CFG::$pinpie['template function']) {
       static::$times['Tag #' . $tag['index'] . ' calling external template function'] = microtime(true);
       $f = CFG::$pinpie['template function']; //can't remember how to call a func by name from an array & m too lazy to google it, sorry
@@ -468,7 +468,7 @@ class PinPIE {
           ksort($tag[$storage]);
           foreach ($tag[$storage] as $priority => $vars) {
             if (isset($vars[$placeholder])) {
-              $r = static::replacePlaceholdersRecursive(implode('', $vars[$placeholder]), $tag, $kill, $depth);
+              $r .= static::replacePlaceholdersRecursive(implode('', $vars[$placeholder]), $tag, $kill, $depth);
               if (CFG::$pinpie['template clear vars after use']) {
                 $kill[$storage][$priority][] = $placeholder;
               }
@@ -594,13 +594,62 @@ class PinPIE {
         (\r\n|\n\r|\r|\n)*
       /xsmuS',
       function ($matches) use ($parent, $priority) {
-        $matches += ['', '', '', '', '', '', '']; //defaults =) to prevent warning on last (enter)* detector
-        return static::createTag($matches, $parent, $priority);
+        /* defaults =) to prevent warning on last (enter)* detector */
+        $matches += ['', '', '', '', '', '', ''];
+        /* creating tag from array of matches */
+        $tag = static::tagCreate($matches, $parent, $priority);
+        /* put tag to all tags list and set currentTag integer value to current tag index */
+        $tag['index'] = count(static::$tags);
+        static::$tags[] = &$tag; /* !!! &&& BY REF HERE &&& !!! */
+        static::$currentTag = $tag['index'];
+        /* Transfer vars and files from parent to this tag */
+        static::tagTakeFromParent($tag);
+        /* render output */
+        $tag['output'] = static::tagGetContent($tag);
+        if (!empty($tag['output'])){
+          /* if tag output is not empty - add line endings to make tags with line endings just after tag
+          have its output have new line chars. And tags without new line chars after tags will be
+          replaced only with its output. */
+          $tag['output'] .= $matches[6];
+        }
+        /* check if the output have to go to placeholder and put if yes */
+        $tag = static::tagProcessDelayed($tag);
+        /* Transfer all vars and files back to parent */
+        static::tagReturnToParent($tag);
+        /* set time for debug */
+        $tag['time']['end'] = microtime(true);
+        $tag['time']['total'] = $tag['time']['end'] - $tag['time']['start'];
+        /* return tag output so it will replace tag in the text with its output */
+        return $tag['output'];
       }
       , $content);
     array_pop(static::$path);
     static::$depth--;
     return $content;
+  }
+
+  private static function tagTakeFromParent(&$tag) {
+    /* take all stuff from parent and feed to tag */
+    $tag['parents'] = static::$tags[$tag['parent']]['parents'];
+    $tag['parents'][] = $tag['parent'];
+    static::$tags[$tag['parent']]['children'][] = $tag['index'];
+    $tag['child index'] = count(static::$tags[$tag['parent']]['children']) - 1;
+    $tag['path'] = static::getTagPath($tag);
+    if (static::$tags[$tag['parent']]['cacheble parents'] OR static::$tags[$tag['parent']]['cachetime']) {
+      $tag['cacheble parents'] = true;
+    }
+    //if (!$tag['cacheble parents'] AND !$tag['cachetime']) {
+    $tag['parent vars'] = static::$tags[$tag['parent']]['vars'];
+    //} else {
+    //  $tag['vars'] = static::$tags[$tag['parent']]['vars'];
+    //
+    static::$tags[$tag['parent']]['vars'] = [];
+  }
+
+  private static function tagReturnToParent(&$tag) {
+    //Transfer all vars and files to parent
+    static::transferVars($tag);
+    static::transferFiles($tag);
   }
 
   /**
@@ -609,7 +658,7 @@ class PinPIE {
    * @param $priority
    * @return bool|mixed|string
    */
-  private static function createTag($matches, $parent, $priority) {
+  private static function tagCreate($matches, $parent, $priority) {
     /*
      * Tag with new line after tag
       array (size=8)
@@ -638,6 +687,7 @@ class PinPIE {
       'template' => ($matches[5] == '' ? false : $matches[5]),
       'template filename' => '',
       'filename' => '',
+      'priority' => $priority,
       'parent' => $parent,
       'parents' => [],
       'children' => [],
@@ -670,30 +720,16 @@ class PinPIE {
     $tag['name'] = $name;
     $tag['params'] = $params;
     $tag['value'] = $value;
-    $tag['index'] = count(static::$tags);
-    static::$tags[] = $tag;
-    static::$currentTag = $tag['index'];
-    $tag =  &static::$tags[$tag['index']];
-    $tag['parents'] = static::$tags[$tag['parent']]['parents'];
-    $tag['parents'][] = $tag['parent'];
-    static::$tags[$tag['parent']]['children'][] = $tag['index'];
-    $tag['child index'] = count(static::$tags[$tag['parent']]['children']) - 1;
-    $tag['path'] = static::getTagPath($tag);
-    if (static::$tags[$tag['parent']]['cacheble parents'] OR static::$tags[$tag['parent']]['cachetime']) {
-      $tag['cacheble parents'] = true;
-    }
-    //if (!$tag['cacheble parents'] AND !$tag['cachetime']) {
-    $tag['parent vars'] = static::$tags[$tag['parent']]['vars'];
-    //} else {
-    //  $tag['vars'] = static::$tags[$tag['parent']]['vars'];
-    //
-    static::$tags[$tag['parent']]['vars'] = [];
     ///////////
+    return $tag;
+  }
+
+  private static function tagGetContent(&$tag) {
     $r = '';
     switch ($tag['type']) {
       case '':
       case '$':
-        $r = static::processTag($tag, $priority);
+        $r = static::processSnippet($tag);
         break;
 
       case '#':
@@ -705,14 +741,6 @@ class PinPIE {
         break;
 
       case '%':
-        /*
-        if ($tag['delayed']) {
-          //have to cut the template variable name
-          $r = "[[{$tag['type']}{$tag['name']}={$tag['value']}" . ($tag['params'] ? '?' . $tag['params'] : '') . "]]";
-        } else {
-          $r = $tag['fulltag'];
-        }
-        */
         $r = static::processStatic($tag);
         break;
 
@@ -723,26 +751,22 @@ class PinPIE {
       default :
         PinPIE::logit('Unknown tag found. tag:' . $tag['fulltag'] . ' in ' . static::getTagPath($tag));
     }
-    if ($r !== '') {
-      $r .= $matches[6];
-    }
-    if ($tag['delayed']) {
-      if (!isset($tag['vars'][$priority])) {
-        $tag['vars'][$priority] = [];
-      }
-      if (!isset($tag['vars'][$priority][$tag['delayed']])) {
-        $tag['vars'][$priority][$tag['delayed']] = [];
-      }
-      $tag['vars'][$priority][$tag['delayed']][] = $r;
-      $r = '';
-    }
-    //Transfer all vars and files to parent
-    static::transferVars($tag);
-    static::transferFiles($tag);
-    $tag['time']['end'] = microtime(true);
-    $tag['time']['total'] = $tag['time']['end'] - $tag['time']['start'];
-    //возвращаемое пишется в текст содержиого тега или страницы.
     return $r;
+  }
+
+
+  private static function tagProcessDelayed(&$tag) {
+    if ($tag['delayed']) {
+      if (!isset($tag['vars'][$tag['priority']])) {
+        $tag['vars'][$tag['priority']] = [];
+      }
+      if (!isset($tag['vars'][$tag['priority']][$tag['delayed']])) {
+        $tag['vars'][$tag['priority']][$tag['delayed']] = [];
+      }
+      $tag['vars'][$tag['priority']][$tag['delayed']][] = $tag['output'];
+      $tag['output'] = '';
+    }
+    return $tag;
   }
 
   private static function transferVars(&$tag) {
@@ -847,10 +871,12 @@ class PinPIE {
       return true;
     }
     //парсим содержимое страницы
-    $content = static::parseTags($content, 0);
+    $content = static::parseTags($content, 0, 10000);
     static::$tags[0]['template'] = static::$template;
     static::$tags[0]['vars'][0]['content'][] = $content; //zero for higher priority
     static::$times['page parsed'] = microtime(true);
+    // switching priority to make template vars render first
+    static::$tags[0]['priority'] = 1000;
     $content = static::applyTemplate(static::$tags[0]);
 
     static::$tags[0]['time']['end'] = microtime(true);

@@ -255,11 +255,6 @@ class StatiCon {
   }
 
   /**
-   * @var PinPIE\FastImage
-   */
-  private static $dmeter = null;
-
-  /**
    * @param $path
    * @return array|bool
    */
@@ -270,13 +265,10 @@ class StatiCon {
     if ($cached) {
       return $cached;
     }
-    if (empty(static::$dmeter)) {
-      static::$dmeter = new \PinPIE\FastImage();
-    }
-    static::$dmeter->load($path);
+    $imginfo = getimagesize($path);
     $r = [];
-    $r['type'] = static::$dmeter->getType();
-    $r['size'] = static::$dmeter->getSize();
+    $r['type'] = $imginfo['mime'];
+    $r['size'] = [$imginfo[0], $imginfo[1]];
     \PinPIE::cacheSet($hash, $r);
     return $r;
   }
