@@ -12,9 +12,7 @@ include PINDIR . DS . 'classes' . DS . 'staticon.php';
 include PINDIR . DS . 'classes' . DS . 'cache.php';
 include PINDIR . DS . 'classes' . DS . 'cacher.php';
 
-if (CFG::$pinpie['static dimensions types']) {
-  include PINDIR . DS . 'classes' . DS . 'fastimage.php';
-}
+
 
 PinPIE::$times['PinPIE classes are loaded'] = microtime(true);
 PinPIE::Init();
