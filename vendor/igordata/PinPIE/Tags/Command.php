@@ -1,0 +1,29 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: igors
+ * Date: 2016-08-27
+ * Time: 14:21
+ */
+
+namespace igordata\PinPIE\Tags;
+
+
+class Command extends Tag {
+
+  public function getOutput() {
+    $r = false;
+    switch ($this->name) {
+      case 'template':
+        $this->pinpie->page->template = $this->value;
+        $r = 'Template set to ' . $this->pinpie->page->template;
+        break;
+      default :
+        $err = 'Unknown command skipped. tag:' . $this->fulltag . ' in ' . $this->tagpath;
+        $this->error($err);
+        $this->pinpie->logit($err);
+    }
+    $this->content = $r;
+    return '';
+  }
+}

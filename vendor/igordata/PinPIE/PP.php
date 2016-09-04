@@ -2,64 +2,61 @@
 
 namespace igordata\PinPIE;
 
+use igordata\PinPIE\Tags\Tag;
+
 
 class PP {
-  private static $pinpie = null;
-  public static $c = null;
+  public $root = '';
+  /** @var CFG | null */
   public $conf = null;
-  public $document = null,
+  public
+    $url = ['path' => '/', 'query' => ''],
+    $document = null,
     $template = 'default';
   private $tags = [];
   public $currentTag = null;
-  private $depth = 0, $totaltagsprocessed = 0;
-  private $path = [];
+  public $depth = 0, $totaltagsprocessed = 0;
+  private $tagPath = [];
   public $times = [],
     $errors = [];
 
+  public $vars = [];
+  /** @var Tag | null */
+  public $page = null;
+
+  /** @var Cache | null */
+  public $cache = null;
+
+  public $startTime = 0,
+    $startMemory = 0;
+
+  /* one pinpie instance cache for other classes */
+  public $inCa = [];
+
   public function __construct($config = false) {
-    static::$pinpie = $this;
-    define(__NAMESPACE__ . '\PIN_TIME_START', microtime(true));
-    define(__NAMESPACE__ . '\PIN_MEMORY_START', memory_get_peak_usage());
-    define(__NAMESPACE__ . '\DS', DIRECTORY_SEPARATOR);
-    define(__NAMESPACE__ . '\ROOT', rtrim(str_replace('\\', '/', dirname($_SERVER["SCRIPT_FILENAME"])), DS));
+    $this->startTime = microtime(true);
+    $this->startMemory = memory_get_peak_usage();
+    $this->root = rtrim(str_replace('\\', '/', dirname($_SERVER["SCRIPT_FILENAME"])), DIRECTORY_SEPARATOR);
     if ($config === false) {
-      $config = ROOT . DS . 'config' . DS . basename($_SERVER['SERVER_NAME']) . '.php';
+      $config = $this->root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . basename($_SERVER['SERVER_NAME']) . '.php';
     }
-
     $this->initConfig($config);
-
-
-    $this->times['PinPIE classes are loaded'] = microtime(true);
     $this->Init();
-
     if (!empty($this->conf->pinpie['preinclude']) AND file_exists($this->conf->pinpie['preinclude'])) {
       include $this->conf->pinpie['preinclude'];
     }
-
-    $path = rtrim($this->conf->pinpie['pages folder'], DS) . DS . trim($this->document, DS);
-    if ($this->conf->pinpie['pages realpath check']) {
-      $path = $this->checkPathIsInFolder($path, $this->conf->pinpie['pages folder']);
-    }
-
-    if ($path !== false AND file_exists($path)) {
-      include $path;
-    }
     $this->render();
-
     if (!empty($this->conf->pinpie['postinclude']) AND file_exists($this->conf->pinpie['postinclude'])) {
       include $this->conf->pinpie['postinclude'];
     }
-
     if ($this->conf->showtime) {
-      echo number_format((microtime(true) - PIN_TIME_START) * 1000, 3, '.', '') . "ms";
+      echo number_format((microtime(true) - $this->startTime) * 1000, 3, '.', '') . "ms";
     }
-
   }
 
   private function initConfig($config) {
-    static::$c = $this->conf = new CFG($config);
-    //$this->conf->databases='test';
-    //$this->conf->static_servers = 'test too';
+    $this->conf = new CFG($this);
+    $this->conf->readConf($config);
   }
 
 
@@ -70,34 +67,25 @@ class PP {
       return true;
     }
     $this->initDone = true;
-    $url = parse_url($_SERVER['REQUEST_URI']);
-    $this->document = $this->getDocument($url['path']);
+    $this->url = parse_url($_SERVER['REQUEST_URI']);
+    $this->document = $this->getDocument($this->url['path']);
     if ($this->document === false) {
       //requested url not found
       http_response_code(404);
-      $this->document = trim($this->conf->pinpie['page not found'], DS);
+      $this->document = trim($this->conf->pinpie['page not found'], DIRECTORY_SEPARATOR);
     }
-    $this->tags = [
-      0 => [
-        'index' => 0,
-        'depth' => 0,
-        'name' => 'PAGE',
-        'fulltag' => 'PAGE',
-        'parent' => false,
-        'parents' => [],
-        'type' => '',
-        'cacheble parents' => false,
-        'cachetime' => false,
-        'vars' => [],
-        'parent vars' => [],
-        'files' => [],
-        'children' => [],
-        'time' => ['start' => microtime(true), 'end' => (float)0, 'total' => (float)0, 'processing' => (float)0,],
-      ],
-    ];
-    $this->currentTag = 0;
-    $this->cache = new Cache($this->conf->pinpie['cache type']);
-    ob_start();
+    $page = new  \igordata\PinPIE\Tags\Page($this, 'PAGE', 'PAGE', '', '', 0, '', null, 10000, 0);
+    $page->filename = rtrim($this->conf->pinpie['pages folder'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . trim($this->document, DIRECTORY_SEPARATOR);
+    $page->template = 'default';
+    $this->tags[] = $page;
+    $this->currentTag = $page;
+    $this->page = $page;
+    if (!empty($this->conf->pinpie['cache class'])) {
+      $this->cache = new $this->conf->pinpie['cache class']($this, $this->conf->cache);
+    }else {
+      $this->cache = new \igordata\PinPIE\Cachers\Disabled($this, $this->conf->cache);
+    }
+    $this->times['PinPIE Init done'] = microtime(true);
   }
 
   private $getDocumentRecur = 0;
@@ -113,7 +101,7 @@ class PP {
     $doc = false;
     /////////////////////////////////////////////////////////
     if (is_array($url)) {
-      $surl = implode(DS, $url);
+      $surl = implode(DIRECTORY_SEPARATOR, $url);
     } else {
       $url = trim((string)$url, '/');
       $surl = $url;
@@ -121,8 +109,7 @@ class PP {
     }
     //if $surl is "ololo/ajaja":
     //First step. Look for "/pages/ololo/ajaja.php".
-    $path = $this->conf->pinpie['pages folder'] . DS . $surl . '.php';
-
+    $path = $this->conf->pinpie['pages folder'] . DIRECTORY_SEPARATOR . $surl . '.php';
     if (file_exists($path)) {
       /* file found */
       if ($this->conf->pinpie['pages realpath check'] AND !$this->checkPathIsInFolder($path, $this->conf->pinpie['pages folder'])) {
@@ -132,12 +119,12 @@ class PP {
       $doc = $surl . '.php';
     } else {
       //Second step. If it is directory, look for "/pages/ololo/ajaja/index.php".
-      $path = $this->conf->pinpie['pages folder'] . DS . $surl;
-      if (is_dir($path) AND file_exists($path . DS . 'index.php')) {
+      $path = $this->conf->pinpie['pages folder'] . DIRECTORY_SEPARATOR . $surl;
+      if (is_dir($path) AND file_exists($path . DIRECTORY_SEPARATOR . 'index.php')) {
         if ($this->conf->pinpie['pages realpath check'] AND !$this->checkPathIsInFolder($path, $this->conf->pinpie['pages folder'])) {
           return false;
         }
-        $doc = $surl . DS . 'index.php';
+        $doc = $surl . DIRECTORY_SEPARATOR . 'index.php';
       } else {
         //Third step. If $this->conf->route_to_parent is set greater than zero, will look for nearest parent. Mean "/pages/ololo/ajaja/index.php" if not exist, goes to"/pages/ololo.php" or "/pages/ololo/index.php". (BUT NOT "/pages/index.php" anyway)
         if ($this->conf->pinpie['route to parent'] > 0) {
@@ -168,53 +155,23 @@ class PP {
     if ($pathRealpath === false OR $folderRealpath === false) {
       return false;
     }
-    $folderRealpath = rtrim($folderRealpath, DS) . DS;
+    $folderRealpath = rtrim($folderRealpath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
     if (strlen($pathRealpath) < $folderRealpath) {
       return false;
     }
-    if (substr(rtrim($pathRealpath, DS) . DS, 0, strlen($folderRealpath)) !== $folderRealpath) {
+    if (substr(rtrim($pathRealpath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR, 0, strlen($folderRealpath)) !== $folderRealpath) {
       return false;
     }
     return $path;
   }
 
   public function render() {
-    $this->times['Page code executed'] = microtime(true);
-    $content = ob_get_clean();
-    if ($this->template === false) {
-      //can be used for ajax output
-      echo $content;
-      return true;
-    }
-    //парсим содержимое страницы
-    $content = $this->parseTags($content, 0, 10000);
-    $this->tags[0]['template'] = $this->template;
-    $this->tags[0]['vars'][0]['content'][] = $content; //zero for higher priority
-    $this->times['page parsed'] = microtime(true);
-    // switching priority to make template vars render first
-    $this->tags[0]['priority'] = 1000;
-    $content = $this->applyTemplate($this->tags[0]);
-
-    $this->tags[0]['time']['end'] = microtime(true);
-    $this->tags[0]['time']['total'] = $this->tags[0]['time']['end'] - $this->tags[0]['time']['start'];
-    $this->times['template applied'] = microtime(true);
-    //выводим
-    echo $content;
-    $this->times['echo $content'] = microtime(true);
-    return true;
+    echo $this->page->getOutput();
   }
 
-  private function applyTemplate(&$tag) {
-    return 'olili';
-  }
-
-  private function parseTags($content, $parent = false, $priority = 10000) {
-    $this->depth++;
-    if ($parent !== false AND isset($this->tags[$parent])) {
-      $this->path[] = $this->tags[$parent]['type'] . $this->tags[$parent]['name'];
-    } else {
-      $parent = $this->currentTag;
-    }
+  public function parseTags($content) {
+    $parent = $this->currentTag;
+    $this->tagPath[] = $parent->type . $parent->name;
     $content = preg_replace_callback(/** @lang RegExp */
       '/
         \[
@@ -229,48 +186,72 @@ class PP {
         \]    
         (\r\n|\n\r|\r|\n)*
       /xsmuS',
-      function ($matches) use ($parent, $priority) {
-        return 'whoohoo';
+      function ($matches) use ($parent) {
         /* defaults =) to prevent warning on last (enter)* detector */
         $matches += ['', '', '', '', '', '', ''];
         /* creating tag from array of matches */
-        $tag = static::tagCreate($matches, $parent, $priority);
-        /* put tag to all tags list and set currentTag integer value to current tag index */
-        $tag['index'] = count($this->tags);
-        $this->tags[] = &$tag; /* !!! &&& BY REF HERE &&& !!! */
-        $this->currentTag = $tag['index'];
-        /* Transfer vars and files from parent to this tag */
-        static::tagTakeFromParent($tag);
+        $tag = $this->createTag($matches, $parent);
+        $this->currentTag = $tag;
+        $tag->index = count($this->tags);
+        $this->tags[] = $tag;
+
         /* render output */
-        $tag['output'] = static::tagGetContent($tag);
-        if (!empty($tag['output'])) {
+        $tag->output = $tag->getOutput();
+        if (!empty($tag->output)) {
           /* if tag output is not empty - add line endings to make tags with line endings just after tag
           have its output have new line chars. And tags without new line chars after tags will be
           replaced only with its output. */
-          $tag['output'] .= $matches[6];
+          $tag->output .= $matches[6];
         }
-        /* check if the output have to go to placeholder and put if yes */
-        $tag = static::tagProcessDelayed($tag);
-        /* Transfer all vars and files back to parent */
-        static::tagReturnToParent($tag);
+
         /* set time for debug */
-        $tag['time']['end'] = microtime(true);
-        $tag['time']['total'] = $tag['time']['end'] - $tag['time']['start'];
+        $tag->time['end'] = microtime(true);
+        $tag->time['total'] = $tag->time['end'] - $tag->time['start'];
         /* return tag output so it will replace tag in the text with its output */
-        return $tag['output'];
+        return $tag->output;
       }
       , $content);
-    array_pop($this->path);
-    $this->depth--;
+    array_pop($this->tagPath);
     return $content;
   }
 
+  private function createTag($matches, $parent) {
+    /* $matches
+     * Tag with new line after tag
+      array (size=8)
+        0 => string '[header[!$snippet]template]
+      ' (length=28) <-- New line
+        1 => string 'header' (length=6) <-- placeholder to put tag output in
+        2 => string '!' (length=1) <-- cache forever
+        3 => string '$' (length=1) <-- it is snippet
+        4 => string 'snippet' (length=7) <-- snippet name
+        5 => string 'template' (length=8) <-- template
+        6 => string '
+      ' (length=1) <-- New line
+    */
+    $fulltag = $matches[0];
+    $type = $matches[3];
+    $placeholder = ($matches[1] == '' ? false : $matches[1]);
+    $template = ($matches[5] == '' ? false : $matches[5]);
+    if ($matches[2] === '!') {
+      $cachetime = $this->conf->pinpie['cache forever time'];
+    } else {
+      $cachetime = ($matches[2] == '' ? 0 : (int)$matches[2]);
+    }
+    $fullname = $matches[4];
 
-  public static function report() {
-    static::$pinpie->rep();
+    $tagClass = 'Tag';
+    if (isset($this->conf->pinpie['tags'][$type])) {
+      $tagClass = $this->conf->pinpie['tags'][$type];
+    }
+
+    $tag = new $tagClass($this, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parent, $parent->priority, $parent->depth + 1);
+
+    return $tag;
   }
 
-  private function rep() {
+
+  public function report() {
 
     if (!$this->conf->debug) {
       return false;
@@ -281,8 +262,8 @@ class PP {
     }
     echo '<hr>';
     echo '$times (ms):<br>';
-    echo 'Total: ' . number_format((microtime(true) - PIN_TIME_START) * 1000, 2) . "ms<br>";
-    $prev = PIN_TIME_START;
+    echo 'Total: ' . number_format((microtime(true) - $this->startTime) * 1000, 2) . "ms<br>";
+    $prev = $this->startTime;
     foreach ($this->times as $key => $value) {
       echo number_format(($value - $prev) * 1000, 2) . " : " . $key . "<br>";
       $prev = $value;
@@ -298,21 +279,131 @@ class PP {
     echo '$tags:<br>';
     echo '<pre>';
     foreach ($this->tags as $tag) {
-      if (empty($tag['time'])) {
-        $tag['time'] = ['total' => 0];
+      if (empty($tag->time)) {
+        $tag->time = ['total' => 0];
       }
-      echo str_repeat('  ', $tag['depth']) . $tag['index'] . ' ' . number_format(round($tag['time']['total'] * 1000, 2), 2) . 'ms ' . trim($tag['fulltag'], " \n\r\t") . "\n";
+      echo str_repeat('  ', $tag->depth) . $tag->index . ' ' . number_format(round($tag->time['total'] * 1000, 2), 2) . 'ms ' . trim($tag->fulltag, " \n\r\t") . "\n";
     }
     echo '</pre><br>';
-    foreach ($this->tags as &$tag) {
-      ksort($tag);
-      $tag = ['fulltag' => $tag['fulltag'], 'index' => $tag['index']] + $tag;
+
+
+    $ignore = ['pinpie',];
+    foreach ($this->tags as $tag) {
+      /**
+       * @var $tag Tag
+       */
+
+      echo '<h3>#' . $tag->index . ' ' . $tag->fulltag . '</h3>';
+      echo '<table>';
+      foreach ($tag as $name => $value) {
+        if (in_array($name, $ignore)) {
+          continue;
+        }
+        echo '<tr>';
+        switch ($name) {
+          case 'parent':
+            echo '<td>' . $name . '</td><td>' . ($value ? $value->index : 'NONE') . '</td>';
+            break;
+          case 'hash':
+            echo '<td>' . $name . '</td><td>' . $value . '</td>';
+            break;
+          case 'time':
+            echo '<td>' . $name . '</td><td>total: ' . number_format(round($tag->time['total'] * 1000, 2), 2) . 'ms, processing: ' . number_format(round($tag->time['processing'] * 1000, 2), 2) . 'ms</td>';
+            break;
+          case 'children':
+          case 'parents':
+            $s = [];
+            foreach ($value as $child) {
+              $s[] = $child->index;
+            }
+            echo '<td>' . $name . '</td><td>' . implode(',', $s) . '</td>';
+            break;
+          default:
+            if (is_scalar($value)) {
+              echo '<td>' . $name . '</td><td>' . htmlspecialchars($value) . '</td>';
+              continue;
+            }
+            echo '<td>' . $name . '</td><td>' . htmlspecialchars(var_export($value, true)) . '</td>';
+        }
+
+        echo "</tr>\n";
+      }
+      echo '</table>';
     }
-    unset($tag);
-    echo '<pre>';
-    var_dump($this->tags);
-    echo '</pre>';
     return true;
+  }
+
+  public function logit($str = '') {
+    if (empty($this->conf->pinpie['log'])) {
+      return false;
+    }
+    if ($this->conf->pinpie['log']['show']) {
+      echo $str . "<br>\n";
+    }
+    return file_put_contents($this->conf->pinpie['log']['path'], date('Y.m.d H:i:s') . ' - ' . $str . "\n", FILE_APPEND);
+  }
+
+
+  private $hashURL = false;
+
+  public function getHashURL() {
+    if ($this->hashURL !== false) {
+      return $this->hashURL;
+    }
+    $code = http_response_code();
+    $defaults = ['ignore url' => false, 'ignore query params' => false];
+    $rules = [];
+    $ruleID = 'default';
+    if (isset($this->conf->pinpie['cache rules'][$code])) {
+      $ruleID = $code;
+    }
+    if (is_array($this->conf->pinpie['cache rules'][$ruleID])) {
+      $rules = array_merge($defaults, $this->conf->pinpie['cache rules'][$ruleID]);
+    }
+    $url = $this->url;
+    //Check, if we have to use 'path' part of url, so caching could be done separately for each page
+    if ($rules['ignore url']) {
+      $url['path'] = '';
+    }
+    $url = array_merge(['query' => ''], $url);
+    //Should we ignore all (true) or some (array) of get-params of url, or make it separately. Mean cache of "?page=3" differs from "?page=100".
+    if ($rules['ignore query params'] === true) {
+      $url['query'] = '';
+    } else {
+      parse_str($url['query'], $url['query']);
+      foreach ($rules['ignore query params'] as $p) {
+        if (isset($url['query'][$p])) {
+          unset($url['query'][$p]);
+        }
+      }
+      $url['query'] = http_build_query($url['query']);
+    }
+    $this->hashURL['url path'] = $url['path'];
+    $this->hashURL['url query'] = $url['query'];
+    return $this->hashURL;
+  }
+
+  private $filemtimes = [];
+
+  public function filemtime($file) {
+    if (!isset($this->filemtimes[$file])) {
+      /* file_exists() prevents warning */
+      if (file_exists($file)) {
+        $this->filemtimes[$file] = filemtime($file);
+      } else {
+        $this->filemtimes[$file] = false;
+      }
+    }
+    return $this->filemtimes[$file];
+  }
+
+  private $is_file = [];
+
+  public function is_file($file) {
+    if (!isset($this->is_file[$file])) {
+      $this->is_file[$file] = is_file($file);
+    }
+    return $this->is_file[$file];
   }
 
 }
