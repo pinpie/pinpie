@@ -14,7 +14,6 @@ class PP {
     $document = null,
     $template = 'default';
   private $tags = [];
-  public $currentTag = null;
   public $depth = 0, $totaltagsprocessed = 0;
   private $tagPath = [];
   public $times = [],
@@ -74,15 +73,17 @@ class PP {
       http_response_code(404);
       $this->document = trim($this->conf->pinpie['page not found'], DIRECTORY_SEPARATOR);
     }
-    $page = new  \igordata\PinPIE\Tags\Page($this, 'PAGE', 'PAGE', '', '', 0, '', null, 10000, 0);
+    if (!empty($this->conf->tags['PAGE']['class'])) {
+      $pageclass = $this->conf->tags['PAGE']['class'];
+      $page = new $pageclass($this, $this->conf->tags['PAGE'], 'PAGE', 'PAGE', '', '', 0, '', null, 10000, 0);
+    }
     $page->filename = rtrim($this->conf->pinpie['pages folder'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . trim($this->document, DIRECTORY_SEPARATOR);
     $page->template = 'default';
     $this->tags[] = $page;
-    $this->currentTag = $page;
     $this->page = $page;
     if (!empty($this->conf->pinpie['cache class'])) {
       $this->cache = new $this->conf->pinpie['cache class']($this, $this->conf->cache);
-    }else {
+    } else {
       $this->cache = new \igordata\PinPIE\Cachers\Disabled($this, $this->conf->cache);
     }
     $this->times['PinPIE Init done'] = microtime(true);
@@ -169,8 +170,7 @@ class PP {
     echo $this->page->getOutput();
   }
 
-  public function parseTags($content) {
-    $parent = $this->currentTag;
+  public function parseTags($content, $parent = null) {
     $this->tagPath[] = $parent->type . $parent->name;
     $content = preg_replace_callback(/** @lang RegExp */
       '/
@@ -191,7 +191,6 @@ class PP {
         $matches += ['', '', '', '', '', '', ''];
         /* creating tag from array of matches */
         $tag = $this->createTag($matches, $parent);
-        $this->currentTag = $tag;
         $tag->index = count($this->tags);
         $this->tags[] = $tag;
 
@@ -240,12 +239,17 @@ class PP {
     }
     $fullname = $matches[4];
 
-    $tagClass = 'Tag';
-    if (isset($this->conf->pinpie['tags'][$type])) {
-      $tagClass = $this->conf->pinpie['tags'][$type];
+    $tagClass = '\igordata\PinPIE\Tags\Tag';
+    if (isset($this->conf->tags[$type])) {
+      $tagClass = $this->conf->tags[$type]['class'];
     }
 
-    $tag = new $tagClass($this, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parent, $parent->priority, $parent->depth + 1);
+    $tagSettings = [];
+    if (!empty($this->conf->tags[$type])) {
+      $tagSettings = $this->conf->tags[$type];
+    }
+
+    $tag = new $tagClass($this, $tagSettings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parent, $parent->priority, $parent->depth + 1);
 
     return $tag;
   }

@@ -20,7 +20,8 @@ class CFG {
     $random_stuff = null,
     /** @var PP|null */
     $pinpie = null,
-    $debug = null;
+    $debug = null,
+    $tags = [];
 
   public function __construct($pinpie) {
     $this->pinpie = $pinpie;
@@ -30,8 +31,7 @@ class CFG {
    * Internal method to read configuration file.
    */
   public function readConf($config) {
-    $pinpie = []; //settings for PinPIE
-    $cache = [];
+    $cache = []; // settings for current cacher
     $conf = []; //you can put some custom setting here
     $databases = []; //to store database settings
     $static_servers = []; //list here static content servers addresses if you want to use them
@@ -41,13 +41,6 @@ class CFG {
 
     //Loading defaults
     $pinpie = [
-      'tags' => [
-        '' => '\igordata\PinPIE\Tags\Chunk',
-        '$' => '\igordata\PinPIE\Tags\Snippet',
-        '=' => '\igordata\PinPIE\Tags\Constant',
-        '@' => '\igordata\PinPIE\Tags\Command',
-        '%' => '\igordata\PinPIE\Tags\Staticon',
-      ],
       'cache class' => false,
       'cache rules' => [
         'default' => ['ignore url' => false, 'ignore query params' => []],
@@ -55,36 +48,52 @@ class CFG {
         404 => ['ignore url' => true, 'ignore query params' => []]
       ],
       'cache forever time' => PHP_INT_MAX,
-      'chunks folder' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'chunks',
-      'chunks realpath check' => true,
       'codepage' => 'utf-8',
       'log' => [
         'path' => 'pin.log',
         'show' => false,
       ],
-      'static folder' => $this->pinpie->root,
-      'static gzip level' => 5,
-      'static gzip types' => ['js', 'css'],
-      'static minify types' => ['js', 'css'],
-      'static minify function' => false,
-      'static dimensions types' => ['img'],
-      'static dimensions function' => false,
-      'static draw function' => false,
-      'static realpath check' => true,
-      'pages folder' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'pages',
-      'pages realpath check' => true,
       'page not found' => 'index.php',
       'route to parent' => 1, //read doc. if exact file not found, instead of 404, PinPIE will try to route request to nearest existing parent entry in url. Default is 1, it means PinPIE will handle "site.com/url" and "site.com/url/" as same page.
       'site url' => $_SERVER['SERVER_NAME'],
-      'snippets folder' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'snippets',
-      'snippets realpath check' => true,
       'templates folder' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'templates',
       'template function' => false,
       'template clear vars after use' => false,
       'templates realpath check' => true,
-      'working folder' => $this->pinpie->root,
       'preinclude' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'preinclude.php',
       'postinclude' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'postinclude.php',
+    ];
+
+    $tags = [
+      '' => [
+        'class' => '\igordata\PinPIE\Tags\Chunk',
+        'folder' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'chunks',
+        'realpath check' => true,
+      ],
+      '$' => [
+        'class' => '\igordata\PinPIE\Tags\Snippet',
+        'folder' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'snippets',
+        'realpath check' => true,
+      ],
+      'PAGE' => [
+        'class' => '\igordata\PinPIE\Tags\Page',
+        'folder' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'pages',
+        'realpath check' => true,
+      ],
+      '%' => [
+        'class' => '\igordata\PinPIE\Tags\Staticon',
+        'folder' => $this->pinpie->root,
+        'realpath check' => true,
+        'gzip level' => 5,
+        'gzip types' => ['js', 'css'],
+        'minify types' => ['js', 'css'],
+        'minify function' => false,
+        'dimensions types' => ['img'],
+        'dimensions function' => false,
+        'draw function' => false,
+      ],
+      '=' => ['class' => '\igordata\PinPIE\Tags\Constant'],
+      '@' => ['class' => '\igordata\PinPIE\Tags\Command'],
     ];
 
     //Reading file and overwriting defaults
@@ -117,6 +126,7 @@ class CFG {
     $this->random_stuff = $random_stuff;
     $this->pinpie = $pinpie;
     $this->debug = $debug;
+    $this->tags = $tags;
   }
 
 }

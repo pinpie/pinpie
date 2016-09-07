@@ -12,14 +12,7 @@ use \igordata\PinPIE\PP as PP;
 
 
 class Snippet extends Tag {
-
-  public function __construct(PP $pinpie, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, Tag $parentTag = null, $priority, $depth) {
-    parent::__construct($pinpie, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parentTag, $priority, $depth);
-
-    $this->folder = $this->pinpie->conf->pinpie['snippets folder'];
-    $this->folderCheck = $this->pinpie->conf->pinpie['snippets realpath check'];
-  }
-
+  
   public function getOutput() {
     $time_start = microtime(true);
     $this->pinpie->totaltagsprocessed++;
@@ -36,8 +29,15 @@ class Snippet extends Tag {
 
   protected function doChecks() {
     if (empty($this->filename)) {
-      $this->error('File does\'t exist in expected folder');
+      $this->error('Can\'t create a filename');
       return false;
+    }
+    if ($this->settings['realpath check']) {
+      $path = $this->pinpie->checkPathIsInFolder($this->filename, $this->settings['folder']);
+      if ($path === false) {
+        $this->error('File path "' . $path . '" does\'nt belongs to it\'s expected folder "' . $this->settings['folder'] . '".');
+        return false;
+      }
     }
     if (!file_exists($this->filename)) {
       $this->error('File not found at ' . $this->filename);
@@ -47,7 +47,6 @@ class Snippet extends Tag {
       $this->error('Maximum recursion level achieved');
       return false;
     }
-
     if ($this->pinpie->totaltagsprocessed > 9999) {
       $this->error('Over nine thousands tags processed. It\'s time to stop.');
       return false;
@@ -105,17 +104,11 @@ class Snippet extends Tag {
 
 
   protected function getFilePath() {
-    if (empty($this->folder)) {
-      return false;
+    $folder = '';
+    if (!empty($this->settings['folder'])) {
+      $folder = $this->settings['folder'];
     }
-    $path = $this->folder . DIRECTORY_SEPARATOR . trim($this->name, '\\/') . '.php';
-    if ($this->folderCheck) {
-      $path = $this->pinpie->checkPathIsInFolder($path, $this->folder);
-      if ($path === false) {
-        $this->error('File path "' . $path . '" does\'nt belongs to it\'s expected folder "' . $this->folder . '".');
-      }
-    }
-    return $path;
+    return $folder . DIRECTORY_SEPARATOR . trim($this->name, '\\/') . '.php';
   }
 
   protected function cacheCheckTime($cached) {

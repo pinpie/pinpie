@@ -7,15 +7,19 @@
  */
 
 namespace igordata\PinPIE\Tags;
+
 use \igordata\PinPIE\PP as PP;
 
 
 class Page extends Snippet {
 
-  public function __construct(PP $pinpie, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, Tag $parentTag=null, $priority, $depth) {
-    parent::__construct($pinpie, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parentTag, $priority, $depth);
-    $this->folder = $this->pinpie->conf->pinpie['pages folder'];
-    $this->folderCheck = $this->pinpie->conf->pinpie['pages realpath check'];
+
+  protected function getFilePath() {
+    $folder = '';
+    if (!empty($this->settings['folder'])) {
+      $folder = $this->settings['folder'];
+    }
+    return $folder . DIRECTORY_SEPARATOR . trim($this->filename, '\\/');
   }
 
   protected function getContent() {
@@ -26,6 +30,7 @@ class Page extends Snippet {
     $time_start = microtime(true);
     $this->pinpie->totaltagsprocessed++;
     $this->pinpie->times['Tag #' . $this->index . ' ' . $this->tagpath . ' started processing'] = microtime(true);
+    $this->filename = $this->getFilePath();
     $this->content = $this->render();
     $this->time['processing'] = microtime(true) - $time_start;
     $this->pinpie->times['Tag #' . $this->index . ' ' . $this->tagpath . ' finished processing'] = microtime(true);

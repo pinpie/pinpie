@@ -24,8 +24,6 @@ class Tag {
     $files = [],
     $filename = '',
     $filetime = 0,
-    $folder = '',
-    $folderCheck = true,
     $fullname = '',
     $fulltag = '',
     $hash = false,
@@ -39,6 +37,7 @@ class Tag {
     $parents = [],
     $placeholder = '',
     $priority = 0,
+    $settings = [],
     $tagClassName = '',
     $tagpath = '/',
     $template = false,
@@ -53,7 +52,7 @@ class Tag {
   protected $pinpie = null;
 
 
-  public function __construct(PP $pinpie, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, Tag $parentTag = null, $priority = 10000, $depth = 0) {
+  public function __construct(PP $pinpie, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, Tag $parentTag = null, $priority = 10000, $depth = 0) {
     $this->time = [
       'start' => microtime(true),
       'end' => (float)0,
@@ -61,6 +60,7 @@ class Tag {
       'processing' => (float)0
     ];
     $this->pinpie = $pinpie;
+    $this->settings = $settings;
     $this->tagClassName = __CLASS__;
     $this->fulltag = $fulltag;
     $this->depth = $depth;
@@ -144,7 +144,7 @@ class Tag {
   protected function render() {
     $this->action = 'processed nocache';
     $this->content = $this->getContent();
-    $this->content = $this->pinpie->parseTags($this->content);
+    $this->content = $this->pinpie->parseTags($this->content, $this);
     //Apply template to tag content
     if (!empty($this->template)) {
       $this->output = $this->applyTemplate();
@@ -168,7 +168,7 @@ class Tag {
         $this->pinpie->times['Tag #' . $this->index . ' ' . $this->tagpath . ' begin parsing template'] = microtime(true);
         $this->getTemplateFilename();
         $templateContent = $this->getTemplateContent();
-        $templateContent = $this->pinpie->parseTags($templateContent);
+        $templateContent = $this->pinpie->parseTags($templateContent, $this);
         $this->varsLocal['content'][0][] = $this->content;
         $output = $this->expandVars($templateContent);
       }

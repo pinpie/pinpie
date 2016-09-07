@@ -26,8 +26,8 @@ class Staticon extends Tag {
 
   private $c = [];
 
-  public function __construct(PP $pinpie, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, Tag $parentTag, $priority, $depth) {
-    parent::__construct($pinpie, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parentTag, $priority, $depth);
+  public function __construct(PP $pinpie, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, Tag $parentTag = null, $priority, $depth) {
+    parent::__construct($pinpie, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parentTag, $priority, $depth);
 
     if (!isset($this->pinpie->inCa['static'])) {
       $this->pinpie->inCa['static'] = [];
@@ -46,8 +46,8 @@ class Staticon extends Tag {
       }
     }
 
-    $this->minifie = in_array($this->staticType, $this->pinpie->conf->pinpie['static minify types']);
-    $this->gzip = in_array($this->staticType, $this->pinpie->conf->pinpie['static gzip types']);
+    $this->minifie = in_array($this->staticType, $this->settings['minify types']);
+    $this->gzip = in_array($this->staticType, $this->settings['gzip types']);
 
     $this->filename = $this->getStaticPath();
 
@@ -60,12 +60,12 @@ class Staticon extends Tag {
         $this->checkAndRunGzip();
       }
 
-      if (in_array($this->staticType, $this->pinpie->conf->pinpie['static dimensions types'])) {
+      if (in_array($this->staticType, $this->settings['dimensions types'])) {
         $this->dimensions = $this->getDimensions();
 
       }
       $this->filetime = $this->pinpie->filemtime($this->filename);
-      $this->staticHash = md5($this->pinpie->conf->random_stuff . '*' . $this->filename . '*' . $this->filetime);
+      $this->staticHash = base64_encode(md5($this->pinpie->conf->random_stuff . '*' . $this->filename . '*' . $this->filetime, true));
       $this->url = $this->getStaticUrl();
     }
   }
@@ -98,9 +98,9 @@ class Staticon extends Tag {
   }
 
   private function getStaticPathReal() {
-    $path = $this->pinpie->conf->pinpie['static folder'] . DIRECTORY_SEPARATOR . $this->staticPath;
-    if ($this->pinpie->conf->pinpie['static realpath check']) {
-      $path = $this->pinpie->checkPathIsInFolder($path, $this->pinpie->conf->pinpie['static folder']);
+    $path = $this->settings['folder'] . DIRECTORY_SEPARATOR . $this->staticPath;
+    if ($this->settings['realpath check']) {
+      $path = $this->pinpie->checkPathIsInFolder($path, $this->settings['folder']);
     }
     if (!file_exists($path)) {
       // no such file
@@ -154,7 +154,7 @@ class Staticon extends Tag {
     if (!$this->minifie) {
       return false;
     }
-    if (empty($this->pinpie->conf->pinpie['static minify function'])) {
+    if (empty($this->settings['minify function'])) {
       return false;
     }
     $fp = fopen($this->filename, 'r');
@@ -178,7 +178,7 @@ class Staticon extends Tag {
       return false;
     }
     // Calling user function, where minification is made
-    $func = $this->pinpie->conf->pinpie['static minify function'];
+    $func = $this->settings['minify function'];
     $ufuncr = $func($this);
     // Releasing lock
     flock($fp, LOCK_UN);
@@ -215,8 +215,8 @@ class Staticon extends Tag {
       $this->minifiedPath = $this->c['getMinified'][$this->staticPath]['path'];
     }
     $pi = pathinfo('/' . trim($this->staticPath, '/\\'));
-    $this->minifiedURL = trim($pi['dirname'], '/\\') . DS . 'min.' . $pi['basename'];
-    $this->minifiedPath = $this->pinpie->conf->pinpie['static folder'] . DS . trim($this->minifiedURL, '/\\');
+    $this->minifiedURL = trim($pi['dirname'], '/\\') . DIRECTORY_SEPARATOR . 'min.' . $pi['basename'];
+    $this->minifiedPath = $this->settings['folder'] . DIRECTORY_SEPARATOR . trim($this->minifiedURL, '/\\');
     if ($this->checkMTime($this->filename, $this->minifiedPath)) {
       $useminify = true;
     } else {
@@ -269,8 +269,8 @@ class Staticon extends Tag {
   }
 
   public function getContent() {
-    if (!empty($this->pinpie->conf->pinpie['static draw function'])) {
-      $this->content = $this->pinpie->conf->pinpie['static draw function']($this);
+    if (!empty($this->settings['draw function'])) {
+      $this->content = $this->settings['draw function']($this);
       return $this->content;
     }
     if ($this->cachetime) {
