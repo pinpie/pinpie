@@ -13,9 +13,9 @@ class PP {
     $url = ['path' => '/', 'query' => ''],
     $document = null,
     $template = 'default';
-  private $tags = [];
+  protected $tags = [];
   public $depth = 0, $totaltagsprocessed = 0;
-  private $tagPath = [];
+  protected $tagPath = [];
   public $times = [],
     $errors = [];
 
@@ -23,7 +23,7 @@ class PP {
   /** @var Tag | null */
   public $page = null;
 
-  /** @var Cache | null */
+  /** @var \igordata\PinPIE\Cachers\Cacher | null */
   public $cache = null;
 
   public $startTime = 0,
@@ -32,40 +32,21 @@ class PP {
   /* one pinpie instance cache for other classes */
   public $inCa = [];
 
-  public function __construct($config = false) {
+  public function __construct() {
     $this->startTime = microtime(true);
     $this->startMemory = memory_get_peak_usage();
     $this->root = rtrim(str_replace('\\', '/', dirname($_SERVER["SCRIPT_FILENAME"])), DIRECTORY_SEPARATOR);
-    if ($config === false) {
-      $config = $this->root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . basename($_SERVER['SERVER_NAME']) . '.php';
-    }
-    $this->initConfig($config);
+    $configFile = $this->root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . basename($_SERVER['SERVER_NAME']) . '.php';
+    $this->initConfig($configFile);
     $this->Init();
-    if (!empty($this->conf->pinpie['preinclude']) AND file_exists($this->conf->pinpie['preinclude'])) {
-      include $this->conf->pinpie['preinclude'];
-    }
-    $this->render();
-    if (!empty($this->conf->pinpie['postinclude']) AND file_exists($this->conf->pinpie['postinclude'])) {
-      include $this->conf->pinpie['postinclude'];
-    }
-    if ($this->conf->showtime) {
-      echo number_format((microtime(true) - $this->startTime) * 1000, 3, '.', '') . "ms";
-    }
   }
 
-  private function initConfig($config) {
+  protected function initConfig($config) {
     $this->conf = new CFG($this);
     $this->conf->readConf($config);
   }
 
-
-  private $initDone = false;
-
-  public function Init() {
-    if ($this->initDone) {
-      return true;
-    }
-    $this->initDone = true;
+  protected function Init() {
     $this->url = parse_url($_SERVER['REQUEST_URI']);
     $this->document = $this->getDocument($this->url['path']);
     if ($this->document === false) {
@@ -75,12 +56,12 @@ class PP {
     }
     if (!empty($this->conf->tags['PAGE']['class'])) {
       $pageclass = $this->conf->tags['PAGE']['class'];
-      $page = new $pageclass($this, $this->conf->tags['PAGE'], 'PAGE', 'PAGE', '', '', 0, '', null, 10000, 0);
+      $page = new $pageclass($this, $this->conf->tags['PAGE'], 'PAGE ' . $this->document, 'PAGE', '', $this->template, 0, '', null, 10000, 0);
+      $this->template = &$page->template;
+      $this->tags[] = $page;
+      $this->page = $page;
     }
-    $page->filename = rtrim($this->conf->pinpie['pages folder'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . trim($this->document, DIRECTORY_SEPARATOR);
-    $page->template = 'default';
-    $this->tags[] = $page;
-    $this->page = $page;
+    
     if (!empty($this->conf->pinpie['cache class'])) {
       $this->cache = new $this->conf->pinpie['cache class']($this, $this->conf->cache);
     } else {
@@ -89,9 +70,9 @@ class PP {
     $this->times['PinPIE Init done'] = microtime(true);
   }
 
-  private $getDocumentRecur = 0;
+  protected $getDocumentRecur = 0;
 
-  private function getDocument($url) {
+  protected function getDocument($url) {
     $this->getDocumentRecur++;
     if ($this->getDocumentRecur > $this->conf->pinpie['route to parent']) {
       return false;
@@ -110,19 +91,19 @@ class PP {
     }
     //if $surl is "ololo/ajaja":
     //First step. Look for "/pages/ololo/ajaja.php".
-    $path = $this->conf->pinpie['pages folder'] . DIRECTORY_SEPARATOR . $surl . '.php';
+    $path = $this->conf->tags['PAGE']['folder'] . DIRECTORY_SEPARATOR . $surl . '.php';
     if (file_exists($path)) {
       /* file found */
-      if ($this->conf->pinpie['pages realpath check'] AND !$this->checkPathIsInFolder($path, $this->conf->pinpie['pages folder'])) {
+      if ($this->conf->tags['PAGE']['realpath check'] AND !$this->checkPathIsInFolder($path, $this->conf->pinpie['pages folder'])) {
         /* if file was found, but had to check realpath and check failed (file is not in dir where it have to be) */
         return false;
       }
       $doc = $surl . '.php';
     } else {
       //Second step. If it is directory, look for "/pages/ololo/ajaja/index.php".
-      $path = $this->conf->pinpie['pages folder'] . DIRECTORY_SEPARATOR . $surl;
+      $path = $this->conf->tags['PAGE']['folder'] . DIRECTORY_SEPARATOR . $surl;
       if (is_dir($path) AND file_exists($path . DIRECTORY_SEPARATOR . 'index.php')) {
-        if ($this->conf->pinpie['pages realpath check'] AND !$this->checkPathIsInFolder($path, $this->conf->pinpie['pages folder'])) {
+        if ($this->conf->tags['PAGE']['realpath check'] AND !$this->checkPathIsInFolder($path, $this->conf->tags['PAGE']['folder'])) {
           return false;
         }
         $doc = $surl . DIRECTORY_SEPARATOR . 'index.php';
@@ -157,17 +138,29 @@ class PP {
       return false;
     }
     $folderRealpath = rtrim($folderRealpath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    $pathRealpath = rtrim($pathRealpath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
     if (strlen($pathRealpath) < $folderRealpath) {
       return false;
     }
-    if (substr(rtrim($pathRealpath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR, 0, strlen($folderRealpath)) !== $folderRealpath) {
+    if (substr($pathRealpath, 0, strlen($folderRealpath)) !== $folderRealpath) {
       return false;
     }
     return $path;
   }
 
   public function render() {
+    ob_start();
+    if (!empty($this->conf->pinpie['preinclude']) AND file_exists($this->conf->pinpie['preinclude'])) {
+      include $this->conf->pinpie['preinclude'];
+    }
     echo $this->page->getOutput();
+    if (!empty($this->conf->pinpie['postinclude']) AND file_exists($this->conf->pinpie['postinclude'])) {
+      include $this->conf->pinpie['postinclude'];
+    }
+    if ($this->conf->showtime) {
+      echo number_format((microtime(true) - $this->startTime) * 1000, 3, '.', '') . "ms";
+    }
+    return ob_get_clean();
   }
 
   public function parseTags($content, $parent = null) {
@@ -214,7 +207,7 @@ class PP {
     return $content;
   }
 
-  private function createTag($matches, $parent) {
+  protected function createTag($matches, $parent) {
     /* $matches
      * Tag with new line after tag
       array (size=8)
@@ -348,7 +341,7 @@ class PP {
   }
 
 
-  private $hashURL = false;
+  protected $hashURL = false;
 
   public function getHashURL() {
     if ($this->hashURL !== false) {
@@ -387,7 +380,7 @@ class PP {
     return $this->hashURL;
   }
 
-  private $filemtimes = [];
+  protected $filemtimes = [];
 
   public function filemtime($file) {
     if (!isset($this->filemtimes[$file])) {
@@ -401,7 +394,7 @@ class PP {
     return $this->filemtimes[$file];
   }
 
-  private $is_file = [];
+  protected $is_file = [];
 
   public function is_file($file) {
     if (!isset($this->is_file[$file])) {

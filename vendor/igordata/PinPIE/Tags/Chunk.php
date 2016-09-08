@@ -8,8 +8,6 @@
 
 namespace igordata\PinPIE\Tags;
 
-use \igordata\PinPIE\PP as PP;
-
 
 class Chunk extends Snippet {
   

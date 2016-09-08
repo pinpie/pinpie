@@ -10,10 +10,10 @@ namespace igordata\PinPIE;
 
 class CFG {
 
-  // descriptions are in ::ReadConf() func
+  // descriptions are in ReadConf()
   public
     $cache = null,
-    $conf = null,
+    $oth = null,
     $databases = null,
     $static_servers = null,
     $showtime = null,
@@ -32,7 +32,7 @@ class CFG {
    */
   public function readConf($config) {
     $cache = []; // settings for current cacher
-    $conf = []; //you can put some custom setting here
+    $oth = []; //you can put some custom setting here
     $databases = []; //to store database settings
     $static_servers = []; //list here static content servers addresses if you want to use them
     $showtime = false; //show page generating time
@@ -119,7 +119,7 @@ class CFG {
     }
 
     $this->cache = $cache;
-    $this->conf = $conf; //you can use that array to store settings for your own scripts
+    $this->oth = $oth; //you can use that array to store settings for your own scripts
     $this->databases = $databases;
     $this->static_servers = $static_servers;
     $this->showtime = $showtime;

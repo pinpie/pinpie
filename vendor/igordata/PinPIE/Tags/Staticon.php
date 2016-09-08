@@ -36,7 +36,7 @@ class Staticon extends Tag {
 
 
     $this->staticType = $this->name;
-    $this->staticPath = $this->value . (!empty($this->params) ? '?' . $this->params : '');
+    $this->staticPath = $this->value . (!empty($this->params) ? '?' . implode('&', $this->params) : '');
 
     if (empty($this->staticPath)) {
       $this->error($fulltag . ' static file path is empty');
@@ -65,7 +65,7 @@ class Staticon extends Tag {
 
       }
       $this->filetime = $this->pinpie->filemtime($this->filename);
-      $this->staticHash = base64_encode(md5($this->pinpie->conf->random_stuff . '*' . $this->filename . '*' . $this->filetime, true));
+      $this->staticHash = md5($this->pinpie->conf->random_stuff . '*' . $this->filename . '*' . $this->filetime);
       $this->url = $this->getStaticUrl();
     }
   }

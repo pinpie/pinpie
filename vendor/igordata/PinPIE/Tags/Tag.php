@@ -41,6 +41,7 @@ class Tag {
     $tagClassName = '',
     $tagpath = '/',
     $template = false,
+    $templateParams = [],
     $templateFilename = '',
     $time = ['start' => 0, 'end' => 0, 'total' => 0, 'processing' => 0],
     $type = '',
@@ -66,7 +67,13 @@ class Tag {
     $this->depth = $depth;
     $this->type = $type;
     $this->placeholder = $placeholder;
-    $this->template = $template;
+
+    $template = explode('?', $template, 2);
+    // extracting params [[tag?params]]
+    if (isset($template[1])) {
+      parse_str($template[1], $this->templateParams);
+    }
+    $this->template = $template[0];
     $this->priority = $priority;
     $this->parent = $parentTag;
     if ($this->parent) {
@@ -81,13 +88,12 @@ class Tag {
       }
     }
     $this->cachetime = $cachetime;
-    $params = null;
     $value = null;
     $this->fullname = $fullname;
     $name = explode('?', $fullname, 2);
-    // extracting params [[tag?params]]
+    // extracting params [[tag?params=foobar]]
     if (isset($name[1])) {
-      $params = $name[1];
+      parse_str($name[1], $this->params);
     }
     $name = $name[0];
     //extracting direct value [[tag=value]]
@@ -97,7 +103,6 @@ class Tag {
     }
     $name = $name[0];
     $this->name = $name;
-    $this->params = $params;
     $this->value = $value;
     $path = [];
     foreach ($this->parents as $parent) {
@@ -194,7 +199,7 @@ class Tag {
     if (!$this->template OR !$this->templateFilename) {
       return '[[*content]]';
     }
-    return $this->fileExecute($this->templateFilename);
+    return $this->fileExecute($this->templateFilename, $this->templateParams);
   }
 
   protected function error($text) {
@@ -258,9 +263,8 @@ class Tag {
         }
         $placeholder = $placeholder[0];
         if ($this->pinpie->conf->debug) {
-          $r = '[[*' . $placeholder . ']]' . $r;
+          $r = '&#91;&#91;&#42;' . $placeholder . '&#93;&#93;' . $r;
         }
-
         $var = [];
         if (isset($this->pinpie->vars[$placeholder])) {
           $var = $this->pinpie->vars[$placeholder];
@@ -288,6 +292,8 @@ class Tag {
           }
         }
         $r .= $this->replacePlaceholdersRecursive($varcontent, $depth);
+
+
         return $r;
       }, $content);
     return $content;

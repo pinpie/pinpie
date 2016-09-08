@@ -21,12 +21,10 @@ class Cacher {
   }
 
   public function get(Tag $tag) {
-    $hash = $this->getHash($tag);
     return false;
   }
 
   public function set(Tag $tag, $data, $time = 0) {
-    $hash = $this->getHash($tag);
     return true;
   }
 

@@ -13,7 +13,7 @@ class APC extends Cacher {
     return apc_fetch($hash);
   }
 
-  public function set(Tag $tag, $data, $time) {
+  public function set(Tag $tag, $data, $time = 0) {
     $hash = $this->getHash($tag);
     return apc_store($hash, $data, $time);
   }

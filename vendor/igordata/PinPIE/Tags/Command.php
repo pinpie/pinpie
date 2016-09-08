@@ -16,6 +16,7 @@ class Command extends Tag {
     switch ($this->name) {
       case 'template':
         $this->pinpie->page->template = $this->value;
+        $this->pinpie->page->templateParams = $this->params;
         $r = 'Template set to ' . $this->pinpie->page->template;
         break;
       default :
