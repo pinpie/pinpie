@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: igors
- * Date: 2016-08-16
- * Time: 21:51
- */
 
 namespace igordata\PinPIE;
 

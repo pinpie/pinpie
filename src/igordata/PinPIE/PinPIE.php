@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: igors
- * Date: 2016-09-07
- * Time: 22:21
- */
 
 namespace igordata\PinPIE;
 
@@ -26,9 +20,7 @@ class PinPIE {
       }
       echo $pinpie->render();
     } catch (NewPageException $np) {
-      echo 'New page';
       ob_clean();
-      var_dump($np->page);
       static::newInstance($np->page);
     } catch (\Throwable $thr) {
       var_dump($thr);

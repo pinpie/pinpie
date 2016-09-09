@@ -1,14 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: igors
- * Date: 2016-08-27
- * Time: 21:39
- */
 
 namespace igordata\PinPIE\Tags;
-
-use \igordata\PinPIE\PP as PP;
 
 
 class Snippet extends Tag {
@@ -35,7 +27,7 @@ class Snippet extends Tag {
     if ($this->settings['realpath check']) {
       $path = $this->pinpie->checkPathIsInFolder($this->filename, $this->settings['folder']);
       if ($path === false) {
-        $this->error('File path "' . $path . '" does\'nt belongs to it\'s expected folder "' . $this->settings['folder'] . '".');
+        $this->error('File path "' . $this->filename . '" does\'nt belongs to it\'s expected folder "' . $this->settings['folder'] . '".');
         return false;
       }
     }

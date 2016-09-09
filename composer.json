@@ -1,0 +1,23 @@
+{
+  "name": "pinpie/pinpie",
+  "type": "project",
+  "description": "PinPIE is a small and fast PHP site engine",
+  "homepage": "http://pinpie.ru",
+  "keywords": "",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Igor Data",
+      "email": "igor.s.data@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0"
+  },
+  "autoload": {
+    "psr-0": {
+      "pinpie\\pinpie": "src"
+    }
+  }
+}
