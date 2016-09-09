@@ -1,9 +1,9 @@
 <?php
 
-namespace igordata\PinPIE\Tags;
+namespace pinpie\pinpie\Tags;
 
-use \igordata\PinPIE;
-use \igordata\PinPIE\PP as PP;
+use \pinpie\pinpie;
+use \pinpie\pinpie\PP as PP;
 
 class Tag {
   public

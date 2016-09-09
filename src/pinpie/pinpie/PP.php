@@ -1,8 +1,8 @@
 <?php
 
-namespace igordata\PinPIE;
+namespace pinpie\pinpie;
 
-use igordata\PinPIE\Tags\Tag;
+use pinpie\pinpie\Tags\Tag;
 
 
 class PP {
@@ -23,7 +23,7 @@ class PP {
   /** @var Tag | null */
   public $page = null;
 
-  /** @var \igordata\PinPIE\Cachers\Cacher | null */
+  /** @var \pinpie\pinpie\Cachers\Cacher | null */
   public $cache = null;
 
   public $startTime = 0,
@@ -65,7 +65,7 @@ class PP {
     if (!empty($this->conf->pinpie['cache class'])) {
       $this->cache = new $this->conf->pinpie['cache class']($this, $this->conf->cache);
     } else {
-      $this->cache = new \igordata\PinPIE\Cachers\Disabled($this, $this->conf->cache);
+      $this->cache = new \pinpie\pinpie\Cachers\Disabled($this, $this->conf->cache);
     }
     $this->times['PinPIE Init done'] = microtime(true);
   }
@@ -232,7 +232,7 @@ class PP {
     }
     $fullname = $matches[4];
 
-    $tagClass = '\igordata\PinPIE\Tags\Tag';
+    $tagClass = '\pinpie\pinpie\Tags\Tag';
     if (isset($this->conf->tags[$type])) {
       $tagClass = $this->conf->tags[$type]['class'];
     }

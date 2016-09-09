@@ -1,6 +1,6 @@
 <?php
 
-namespace igordata\PinPIE;
+namespace pinpie\pinpie;
 
 class CFG {
 
@@ -60,22 +60,22 @@ class CFG {
 
     $tags = [
       '' => [
-        'class' => '\igordata\PinPIE\Tags\Chunk',
+        'class' => '\pinpie\pinpie\Tags\Chunk',
         'folder' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'chunks',
         'realpath check' => true,
       ],
       '$' => [
-        'class' => '\igordata\PinPIE\Tags\Snippet',
+        'class' => '\pinpie\pinpie\Tags\Snippet',
         'folder' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'snippets',
         'realpath check' => true,
       ],
       'PAGE' => [
-        'class' => '\igordata\PinPIE\Tags\Page',
+        'class' => '\pinpie\pinpie\Tags\Page',
         'folder' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'pages',
         'realpath check' => true,
       ],
       '%' => [
-        'class' => '\igordata\PinPIE\Tags\Staticon',
+        'class' => '\pinpie\pinpie\Tags\Staticon',
         'folder' => $this->pinpie->root,
         'realpath check' => true,
         'gzip level' => 5,
@@ -86,8 +86,8 @@ class CFG {
         'dimensions function' => false,
         'draw function' => false,
       ],
-      '=' => ['class' => '\igordata\PinPIE\Tags\Constant'],
-      '@' => ['class' => '\igordata\PinPIE\Tags\Command'],
+      '=' => ['class' => '\pinpie\pinpie\Tags\Constant'],
+      '@' => ['class' => '\pinpie\pinpie\Tags\Command'],
     ];
 
     //Reading file and overwriting defaults
@@ -101,10 +101,10 @@ class CFG {
     if (isset($pinpie['cache type'])) {
       if (empty($pinpie['cache class'])) {
         $pinpieCacheClasses = [
-          'disabled' => '\igordata\PinPIE\Cachers\Disabled',
-          'files' => '\igordata\PinPIE\Cachers\Files',
-          'APC' => '\igordata\PinPIE\Cachers\APC',
-          'Memcache' => '\igordata\PinPIE\Cachers\Memcache',
+          'disabled' => '\pinpie\pinpie\Cachers\Disabled',
+          'files' => '\pinpie\pinpie\Cachers\Files',
+          'APC' => '\pinpie\pinpie\Cachers\APC',
+          'Memcache' => '\pinpie\pinpie\Cachers\Memcache',
         ];
         if (isset($pinpieCacheClasses[$pinpie['cache type']])) {
           $pinpie['cache class'] = $pinpieCacheClasses[$pinpie['cache type']];

@@ -1,8 +1,8 @@
 <?php
 
-namespace igordata\PinPIE\Tags;
+namespace pinpie\pinpie\Tags;
 
-use \igordata\PinPIE\PP as PP;
+use \pinpie\pinpie\PP as PP;
 
 
 class Staticon extends Tag {

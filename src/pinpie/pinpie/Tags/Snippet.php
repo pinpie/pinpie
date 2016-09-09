@@ -1,6 +1,6 @@
 <?php
 
-namespace igordata\PinPIE\Tags;
+namespace pinpie\pinpie\Tags;
 
 
 class Snippet extends Tag {

@@ -1,6 +1,6 @@
 <?php
 
-namespace igordata\PinPIE;
+namespace pinpie\pinpie;
 
 
 class PinPIE {
@@ -11,7 +11,7 @@ class PinPIE {
 
   public static function newInstance($page = false) {
     try {
-      $pinpie = new \igordata\PinPIE\PP();
+      $pinpie = new \pinpie\pinpie\PP();
       static::$pinpie = $pinpie;
       static::$tempate = &static::$pinpie->template;
       static::$conf = &static::$pinpie->conf;

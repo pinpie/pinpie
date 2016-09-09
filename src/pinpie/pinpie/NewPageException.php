@@ -1,6 +1,6 @@
 <?php
 
-namespace igordata\PinPIE;
+namespace pinpie\pinpie;
 
 
 class NewPageException extends \Exception {

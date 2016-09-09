@@ -1,10 +1,10 @@
 <?php
 
-namespace igordata\PinPIE\Cachers;
+namespace pinpie\pinpie\Cachers;
 
 
-use igordata\PinPIE\PP;
-use igordata\PinPIE\Tags\Tag;
+use pinpie\pinpie\PP;
+use pinpie\pinpie\Tags\Tag;
 
 class APC extends Cacher {
 
