@@ -35,7 +35,7 @@ class PP {
   public function __construct() {
     $this->startTime = microtime(true);
     $this->startMemory = memory_get_peak_usage();
-    $this->times[(string)$this->startTime] = 'Starting';
+    $this->times[] = [$this->startTime, 'Starting'];
     $this->root = rtrim(str_replace('\\', '/', dirname($_SERVER["SCRIPT_FILENAME"])), DIRECTORY_SEPARATOR);
     $configFile = $this->root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . basename($_SERVER['SERVER_NAME']) . '.php';
     $this->initConfig($configFile);
@@ -68,7 +68,7 @@ class PP {
     } else {
       $this->cacher = new \pinpie\pinpie\Cachers\Disabled($this, $this->conf->cache);
     }
-    $this->times[(string)microtime(true)] = 'PinPIE Init done';
+    $this->times[] = [microtime(true), 'PinPIE Init done'];
   }
 
   protected $getDocumentRecur = 0;
@@ -95,7 +95,7 @@ class PP {
     $path = $this->conf->tags['PAGE']['folder'] . DIRECTORY_SEPARATOR . $surl . '.php';
     if (file_exists($path)) {
       /* file found */
-      if ($this->conf->tags['PAGE']['realpath check'] AND !$this->checkPathIsInFolder($path, $this->conf->pinpie['pages folder'])) {
+      if ($this->conf->tags['PAGE']['realpath check'] AND !$this->checkPathIsInFolder($path, $this->conf->tags['PAGE']['folder'])) {
         /* if file was found, but had to check realpath and check failed (file is not in dir where it have to be) */
         return false;
       }
