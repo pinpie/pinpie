@@ -35,6 +35,7 @@ class PP {
   public function __construct() {
     $this->startTime = microtime(true);
     $this->startMemory = memory_get_peak_usage();
+    $this->times[(string)$this->startTime] = 'Starting';
     $this->root = rtrim(str_replace('\\', '/', dirname($_SERVER["SCRIPT_FILENAME"])), DIRECTORY_SEPARATOR);
     $configFile = $this->root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . basename($_SERVER['SERVER_NAME']) . '.php';
     $this->initConfig($configFile);
@@ -67,7 +68,7 @@ class PP {
     } else {
       $this->cacher = new \pinpie\pinpie\Cachers\Disabled($this, $this->conf->cache);
     }
-    $this->times['PinPIE Init done'] = microtime(true);
+    $this->times[(string)microtime(true)] = 'PinPIE Init done';
   }
 
   protected $getDocumentRecur = 0;
@@ -127,13 +128,16 @@ class PP {
    *
    */
   public function checkPathIsInFolder($path, $folder) {
+    $this->pinpie->times[] = [microtime(true), 'checking if ' . $path . ' belongs to ' . $folder];
     if (!$path OR !$folder) {
       return false;
     }
     $path = str_replace('\\', '/', $path);
     $folder = str_replace('\\', '/', $folder);
+    $this->pinpie->times[] = [microtime(true), 'realpath'];
     $folderRealpath = realpath($folder);
     $pathRealpath = realpath($path);
+    $this->pinpie->times[] = [microtime(true), 'realpath done'];
     if ($pathRealpath === false OR $folderRealpath === false) {
       return false;
     }
@@ -271,9 +275,9 @@ class PP {
     echo '$times (ms):<br>';
     echo 'Total: ' . number_format((microtime(true) - $this->startTime) * 1000, 2) . "ms<br>";
     $prev = $this->startTime;
-    foreach ($this->times as $key => $value) {
-      echo number_format(($value - $prev) * 1000, 2) . " : " . $key . "<br>";
-      $prev = $value;
+    foreach ($this->times as $t) {
+      echo number_format(($t[0] - $prev) * 1000, 2) . " : " . $t[1] . "<br>";
+      $prev = $t[0];
     }
     echo '<br><br>';
     if (empty($this->errors)) {
@@ -289,7 +293,11 @@ class PP {
       if (empty($tag->time)) {
         $tag->time = ['total' => 0];
       }
-      echo str_pad($tag->index, 4, ' ', STR_PAD_LEFT) . '  ' . str_repeat('  ', $tag->depth) . number_format(round($tag->time['total'] * 1000, 2), 2) . 'ms ' . trim($tag->fulltag, " \n\r\t") . "\n";
+      echo str_pad($tag->index, 4, ' ', STR_PAD_LEFT) . '  ' .
+
+        str_pad(number_format(round($tag->time['total'] * 1000, 2), 2) . 'ms ', 10, ' ', STR_PAD_LEFT)
+        . '  '
+        . str_repeat('  ', $tag->depth) . trim($tag->fulltag, " \n\r\t") . "\n";
     }
     echo '</pre><br>';
 

@@ -160,11 +160,11 @@ class Tag {
     $output = $this->content;
     if (!empty($this->template)) {
       if ($this->pinpie->conf->pinpie['template function']) {
-        $this->pinpie->times['Tag #' . $this->index . ' calling external template function'] = microtime(true);
+        $this->pinpie->times[]=[microtime(true), 'Tag #' . $this->index . ' calling external template function'];
         $this->pinpie->conf->pinpie['template function'](this);
-        $this->pinpie->times['Tag #' . $this->index . ' finished external template function'] = microtime(true);
+        $this->pinpie->times[]=[microtime(true),'Tag #' . $this->index . ' finished external template function'];
       } else {
-        $this->pinpie->times['Tag #' . $this->index . ' ' . $this->tagpath . ' begin parsing template'] = microtime(true);
+        $this->pinpie->times[]=[microtime(true), 'Tag #' . $this->index . ' ' . $this->tagpath . ' begin parsing template'];
         $this->getTemplateFilename();
         $templateContent = $this->getTemplateContent();
         $templateContent = $this->pinpie->parseTags($templateContent, $this);
@@ -207,7 +207,7 @@ class Tag {
   protected function fileExecute($filename, $params = []) {
     static $i = 0;
     $i++;
-    $this->pinpie->times['executing ' . $filename . ' ' . $i] = microtime(true);
+    $this->pinpie->times[]=[microtime(true), 'executing ' . $filename . ' ' . $i];
     if (is_string($params)) {
       parse_str($params, $params);
     }
@@ -216,7 +216,7 @@ class Tag {
     }
     ob_start();
     include $filename;
-    $this->pinpie->times['executed ' . $filename . ' ' . $i] = microtime(true);
+    $this->pinpie->times[]=[microtime(true), 'executed ' . $filename . ' ' . $i];
     return ob_get_clean();
   }
 
@@ -225,7 +225,7 @@ class Tag {
 
   protected function expandVars($content) {
     $this->counterExpandVars++;
-    $this->pinpie->times['Tag #' . $this->index . ' expanding vars ' . $this->counterExpandVars] = microtime(true);
+    $this->pinpie->times[]=[microtime(true), 'Tag #' . $this->index . ' expanding vars ' . $this->counterExpandVars];
     //have to do this to use vars on the same tag it was created
     /*    if (isset($this->vars'][0]) AND isset($this->vars'][0]['content']) AND strpos($content, '[[*content]]') !== false) {
           $content = str_replace('[[*content]]', implode('', $this->vars'][0]['content']), $content);
@@ -233,7 +233,7 @@ class Tag {
         }*/
     $depth = 100;
     $content = static::replacePlaceholdersRecursive($content, $depth);
-    $this->pinpie->times['Tag #' . $this->index . ' finished expanding vars ' . $this->counterExpandVars] = microtime(true);
+    $this->pinpie->times[]=[microtime(true), 'Tag #' . $this->index . ' finished expanding vars ' . $this->counterExpandVars];
     return $content;
   }
 

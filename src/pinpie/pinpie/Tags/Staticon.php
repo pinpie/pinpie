@@ -22,7 +22,8 @@ class Staticon extends Tag {
 
   public function __construct(PP $pinpie, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, Tag $parentTag = null, $priority, $depth) {
     parent::__construct($pinpie, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parentTag, $priority, $depth);
-      if (!isset($this->pinpie->inCa['static'])) {
+    $this->pinpie->times[] = [microtime(true), 'static ' . $fulltag . ' construct started'];
+    if (!isset($this->pinpie->inCa['static'])) {
       $this->pinpie->inCa['static'] = [];
     }
     $this->c = &$this->pinpie->inCa['static'];
@@ -41,28 +42,37 @@ class Staticon extends Tag {
 
     $this->minifie = in_array($this->staticType, $this->settings['minify types']);
     $this->gzip = in_array($this->staticType, $this->settings['gzip types']);
-
+    $this->pinpie->times[] = [microtime(true), '$this->filename = $this->getStaticPath();'];
     $this->filename = $this->getStaticPath();
+    $this->pinpie->times[] = [microtime(true), '$this->filename = $this->getStaticPath(); done'];
 
     if (empty($this->filename)) {
       $this->filename = $this->value;
-    }else{
+    } else {
       if ($this->minifie) {
+        $this->pinpie->times[] = [microtime(true), 'minification'];
         $this->getMinified();
+        $this->pinpie->times[] = [microtime(true), 'minification done'];
       }
 
       if ($this->gzip) {
+        $this->pinpie->times[] = [microtime(true), 'gzip'];
         $this->checkAndRunGzip();
+        $this->pinpie->times[] = [microtime(true), 'gzip done'];
       }
 
       if (in_array($this->staticType, $this->settings['dimensions types'])) {
+        $this->pinpie->times[] = [microtime(true), 'getDimensions'];
         $this->dimensions = $this->getDimensions();
-
+        $this->pinpie->times[] = [microtime(true), 'getDimensions done'];
       }
+
       $this->filetime = $this->pinpie->filemtime($this->filename);
       $this->staticHash = md5($this->filename . '*' . $this->filetime);
     }
+    $this->pinpie->times[] = [microtime(true), 'getStaticUrl'];
     $this->url = $this->getStaticUrl();
+    $this->pinpie->times[] = [microtime(true), 'getStaticUrl done'];
   }
 
   public function getStaticUrl() {
@@ -95,12 +105,18 @@ class Staticon extends Tag {
   private function getStaticPathReal() {
     $path = rtrim($this->settings['folder'], '/\\') . DIRECTORY_SEPARATOR . ltrim($this->staticPath, '/\\');
     if ($this->settings['realpath check']) {
+      $this->pinpie->times[] = [microtime(true), 'realpath check required'];
       $path = $this->pinpie->checkPathIsInFolder($path, $this->settings['folder']);
+      $this->pinpie->times[] = [microtime(true), 'realpath check done'];
+    } else {
+      $this->pinpie->times[] = [microtime(true), 'realpath check skipped'];
     }
     if (empty($path) OR !file_exists($path)) {
+      $this->pinpie->times[] = [microtime(true), 'file not found'];
       // no such file
       return false;
     }
+    $this->pinpie->times[] = [microtime(true), 'getStaticPathReal done'];
     return $path;
   }
 
@@ -127,7 +143,7 @@ class Staticon extends Tag {
   private function checkAndRunGzip() {
     $r = false;
     if (!$this->checkMTime($this->filename, $this->filename . '.gz')) {
-      $this->pinpie->times['#gzipping start ' . $this->filename] = microtime(true);
+      $this->pinpie->times[] = [microtime(true), '#gzipping start ' . $this->filename];
       if (is_file($this->filename)) {
         $fp = fopen($this->filename, 'r');
         if ($fp !== false AND flock($fp, LOCK_EX | LOCK_NB)) {
@@ -140,7 +156,7 @@ class Staticon extends Tag {
           fclose($fp);
         }
       }
-      $this->pinpie->times['#gzipping done ' . $this->filename] = microtime(true);
+      $this->pinpie->times[] = [microtime(true), '#gzipping done ' . $this->filename];
     }
     return $r;
   }
@@ -179,7 +195,7 @@ class Staticon extends Tag {
     flock($fp, LOCK_UN);
     fclose($fp);
     if (!$ufuncr) {
-      $this->pinpie->times['#minify func cancels use of min path by returning false ' . $this->filename] = microtime(true);
+      $this->pinpie->times[] = [microtime(true), '#minify func cancels use of min path by returning false ' . $this->filename];
       return false;
     }
     return $this->checkMTime($this->filename, $this->minifiedPath);
@@ -202,6 +218,7 @@ class Staticon extends Tag {
    * Looks for minified version of the file in the static folder.
    */
   private function getMinified() {
+    $this->pinpie->times[] = [microtime(true), 'getMinified'];
     if (!isset($this->c['getMinified'])) {
       $this->c['getMinified'] = [];
     }
@@ -216,12 +233,14 @@ class Staticon extends Tag {
       $useminify = true;
     } else {
       $useminify = $this->checkAndRunMinifier();
+      $this->pinpie->times[] = [microtime(true), 'checkAndRunMinifier done'];
     }
     if (!$useminify) {
       $this->minifiedURL = false;
     }
     $this->c['getMinified'][$this->staticPath]['url'] = $this->minifiedURL;
     $this->c['getMinified'][$this->staticPath]['path'] = $this->minifiedPath;
+    $this->pinpie->times[] = [microtime(true), 'getMinified done'];
   }
 
 
@@ -264,8 +283,10 @@ class Staticon extends Tag {
   }
 
   public function getContent() {
+    $this->pinpie->times[] = [microtime(true), 'getContent'];
     if (!empty($this->settings['draw function'])) {
       $this->content = $this->settings['draw function']($this);
+      $this->pinpie->times[] = [microtime(true), 'drawn by func'];
       return $this->content;
     }
     if ($this->cachetime) {
@@ -274,6 +295,7 @@ class Staticon extends Tag {
     } else {
       $this->content = $this->draw();
     }
+    $this->pinpie->times[] = [microtime(true), 'drawn'];
     if (!empty($this->template)) {
       $this->varsLocal['content'][0][] = $this->content;
       if (isset($this->dimensions['width'])) {
@@ -287,6 +309,7 @@ class Staticon extends Tag {
       $this->varsLocal['time getHash'][0][] = $this->staticHash;
       $this->varsLocal['url'][0][] = $this->url;
     }
+    $this->pinpie->times[] = [microtime(true), 'getContent done'];
     return $this->content;
   }
 

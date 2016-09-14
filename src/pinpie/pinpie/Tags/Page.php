@@ -20,14 +20,14 @@ class Page extends Snippet {
   public function getOutput() {
     $time_start = microtime(true);
     $this->pinpie->totaltagsprocessed++;
-    $this->pinpie->times['Tag #' . $this->index . ' ' . $this->tagpath . ' started processing'] = microtime(true);
+    $this->pinpie->times[]=[microtime(true), 'Tag #' . $this->index . ' ' . $this->tagpath . ' started processing'];
     $this->filename = $this->getFilePath();
     if (!$this->doChecks()) {
       return '';
     }
     $this->content = $this->render();
     $this->time['processing'] = microtime(true) - $time_start;
-    $this->pinpie->times['Tag #' . $this->index . ' ' . $this->tagpath . ' finished processing'] = microtime(true);
+    $this->pinpie->times[]= [microtime(true),'Tag #' . $this->index . ' ' . $this->tagpath . ' finished processjing'];
     return $this->content;
   }
 
