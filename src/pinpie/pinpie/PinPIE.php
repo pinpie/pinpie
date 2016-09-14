@@ -9,6 +9,7 @@ class PinPIE {
   /** @var null|PP */
   public static $pinpie = null;
   public static $template = null;
+  /** @var null|pinpie\pinpie\CFG */
   public static $conf = null;
   public static $document = null;
 
