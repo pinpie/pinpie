@@ -22,8 +22,7 @@ class Staticon extends Tag {
 
   public function __construct(PP $pinpie, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, Tag $parentTag = null, $priority, $depth) {
     parent::__construct($pinpie, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parentTag, $priority, $depth);
-
-    if (!isset($this->pinpie->inCa['static'])) {
+      if (!isset($this->pinpie->inCa['static'])) {
       $this->pinpie->inCa['static'] = [];
     }
     $this->c = &$this->pinpie->inCa['static'];
@@ -36,7 +35,7 @@ class Staticon extends Tag {
       $this->error($fulltag . ' static file path is empty');
     } else {
       if ($this->staticPath{0} !== '/') {
-        $this->staticPath = $this->pinpie->url['path'] . '/' . $this->staticPath;
+        $this->staticPath = rtrim($this->pinpie->url['path'], '/') . '/' . $this->staticPath;
       }
     }
 
@@ -45,7 +44,9 @@ class Staticon extends Tag {
 
     $this->filename = $this->getStaticPath();
 
-    if (!empty($this->filename)) {
+    if (empty($this->filename)) {
+      $this->filename = $this->value;
+    }else{
       if ($this->minifie) {
         $this->getMinified();
       }
@@ -59,9 +60,9 @@ class Staticon extends Tag {
 
       }
       $this->filetime = $this->pinpie->filemtime($this->filename);
-      $this->staticHash = md5($this->pinpie->conf->random_stuff . '*' . $this->filename . '*' . $this->filetime);
-      $this->url = $this->getStaticUrl();
+      $this->staticHash = md5($this->filename . '*' . $this->filetime);
     }
+    $this->url = $this->getStaticUrl();
   }
 
   public function getStaticUrl() {
@@ -92,11 +93,11 @@ class Staticon extends Tag {
   }
 
   private function getStaticPathReal() {
-    $path = $this->settings['folder'] . DIRECTORY_SEPARATOR . $this->staticPath;
+    $path = rtrim($this->settings['folder'], '/\\') . DIRECTORY_SEPARATOR . ltrim($this->staticPath, '/\\');
     if ($this->settings['realpath check']) {
       $path = $this->pinpie->checkPathIsInFolder($path, $this->settings['folder']);
     }
-    if (!file_exists($path)) {
+    if (empty($path) OR !file_exists($path)) {
       // no such file
       return false;
     }

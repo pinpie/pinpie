@@ -2,10 +2,11 @@
 
 
 spl_autoload_register(function ($class) {
-  $namespace = substr($class, 0, 15);
-  $file = __DIR__ . DIRECTORY_SEPARATOR . str_replace('\\', '/', substr($class, 16)) . '.php';
+  $namespace = substr($class, 0, 14);
+  $className = str_replace('\\', '/', substr($class, 14));
+  $file = __DIR__ . DIRECTORY_SEPARATOR . $className . '.php';
 
-  if ($namespace !== 'pinpie\\PinPIE') {
+  if ($namespace !== 'pinpie\\pinpie\\') {
     return false;
   }
 

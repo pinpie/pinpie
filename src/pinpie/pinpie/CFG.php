@@ -8,10 +8,9 @@ class CFG {
   public
     $cache = null,
     $oth = null,
-    $databases = null,
     $static_servers = null,
+    $databases = null,
     $showtime = null,
-    $random_stuff = null,
     /** @var PP|null */
     $pinpie = null,
     $debug = null,
@@ -30,18 +29,17 @@ class CFG {
     $databases = []; //to store database settings
     $static_servers = []; //list here static content servers addresses if you want to use them
     $showtime = false; //show page generating time
-    $random_stuff = false; //very important to generate long random string for every your site. Please, press as many keys on your keyboard as you can. Or just use online password generators.
     $debug = false; //enables PinPIE::report() output. Use it to enable your own debug mode. Globally available through CFG::$debug.
 
     //Loading defaults
     $pinpie = [
       'cache class' => false,
+      'cache forever time' => PHP_INT_MAX,
       'cache rules' => [
         'default' => ['ignore url' => false, 'ignore query params' => []],
         200 => ['ignore url' => false, 'ignore query params' => []],
         404 => ['ignore url' => true, 'ignore query params' => []]
       ],
-      'cache forever time' => PHP_INT_MAX,
       'codepage' => 'utf-8',
       'log' => [
         'path' => 'pin.log',
@@ -50,9 +48,9 @@ class CFG {
       'page not found' => 'index.php',
       'route to parent' => 1, //read doc. if exact file not found, instead of 404, PinPIE will try to route request to nearest existing parent entry in url. Default is 1, it means PinPIE will handle "site.com/url" and "site.com/url/" as same page.
       'site url' => $_SERVER['SERVER_NAME'],
+      'template clear vars after use' => false,
       'templates folder' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'templates',
       'template function' => false,
-      'template clear vars after use' => false,
       'templates realpath check' => true,
       'preinclude' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'preinclude.php',
       'postinclude' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'postinclude.php',
@@ -117,7 +115,6 @@ class CFG {
     $this->databases = $databases;
     $this->static_servers = $static_servers;
     $this->showtime = $showtime;
-    $this->random_stuff = $random_stuff;
     $this->pinpie = $pinpie;
     $this->debug = $debug;
     $this->tags = $tags;

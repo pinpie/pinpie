@@ -54,7 +54,7 @@ class Snippet extends Tag {
       $content = $this->render();
     } else {
       //кешируем или читаем из кеша
-      $cached = $this->pinpie->cache->get($this);
+      $cached = $this->pinpie->cacher->get($this);
       //прочекать все файлы вдруг они изменились со времени $cached['time']
       //если вернулся фалс, значит либо нету, либо время у файла новее, либо отвалился кеш =)
       if (
@@ -72,7 +72,7 @@ class Snippet extends Tag {
         $this->pinpie->times['Tag #' . $this->index . ' ' . $this->tagpath . ' finished rendering'] = microtime(true);
         // Fresh new content, have to put into the cache.
         // To clean list of files from empty entries I use array_filter(array_keys($this->collectFiles()))].
-        if ($this->pinpie->cache->set($this, ['fulltag' => $this->fulltag, 'content' => $content, 'vars' => $this->vars, 'time' => time(), 'files' => array_filter(array_keys($this->collectFiles()))], $this->cachetime)) {
+        if ($this->pinpie->cacher->set($this, ['fulltag' => $this->fulltag, 'content' => $content, 'vars' => $this->vars, 'time' => time(), 'files' => array_filter(array_keys($this->collectFiles()))], $this->cachetime)) {
           // SAVED
           $this->action = 'processed and cached';
         } else {

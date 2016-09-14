@@ -24,7 +24,7 @@ class PP {
   public $page = null;
 
   /** @var \pinpie\pinpie\Cachers\Cacher | null */
-  public $cache = null;
+  public $cacher = null;
 
   public $startTime = 0,
     $startMemory = 0;
@@ -61,11 +61,11 @@ class PP {
       $this->tags[] = $page;
       $this->page = $page;
     }
-    
+
     if (!empty($this->conf->pinpie['cache class'])) {
-      $this->cache = new $this->conf->pinpie['cache class']($this, $this->conf->cache);
+      $this->cacher = new $this->conf->pinpie['cache class']($this, $this->conf->cache);
     } else {
-      $this->cache = new \pinpie\pinpie\Cachers\Disabled($this, $this->conf->cache);
+      $this->cacher = new \pinpie\pinpie\Cachers\Disabled($this, $this->conf->cache);
     }
     $this->times['PinPIE Init done'] = microtime(true);
   }
@@ -164,7 +164,11 @@ class PP {
   }
 
   public function parseTags($content, $parent = null) {
-    $this->tagPath[] = $parent->type . $parent->name;
+    if (empty($parent)) {
+      $this->tagPath[] = '/';
+    } else {
+      $this->tagPath[] = $parent->type . $parent->name;
+    }
     $content = preg_replace_callback(/** @lang RegExp */
       '/
         \[
@@ -242,7 +246,13 @@ class PP {
       $tagSettings = $this->conf->tags[$type];
     }
 
-    $tag = new $tagClass($this, $tagSettings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parent, $parent->priority, $parent->depth + 1);
+    $priority = 10000;
+    $depth = 0;
+    if (!empty($parent)) {
+      $priority = $parent->priority;
+      $depth = $parent->depth + 1;
+    }
+    $tag = new $tagClass($this, $tagSettings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parent, $priority, $depth);
 
     return $tag;
   }
@@ -279,17 +289,28 @@ class PP {
       if (empty($tag->time)) {
         $tag->time = ['total' => 0];
       }
-      echo str_repeat('  ', $tag->depth) . $tag->index . ' ' . number_format(round($tag->time['total'] * 1000, 2), 2) . 'ms ' . trim($tag->fulltag, " \n\r\t") . "\n";
+      echo str_pad($tag->index, 4, ' ', STR_PAD_LEFT) . '  ' . str_repeat('  ', $tag->depth) . number_format(round($tag->time['total'] * 1000, 2), 2) . 'ms ' . trim($tag->fulltag, " \n\r\t") . "\n";
     }
     echo '</pre><br>';
 
+    return true;
+  }
 
+
+  public function reportTags() {
+    if (!$this->conf->debug) {
+      return false;
+    } else {
+      if (!empty($this->conf->pinpie['report password']) AND (!isset($_GET['PINPIEREPORT']) OR $_GET['PINPIEREPORT'] !== $this->conf->pinpie['report password'])) {
+        return false;
+      }
+    }
+    echo '<hr>';
     $ignore = ['pinpie',];
     foreach ($this->tags as $tag) {
       /**
        * @var $tag Tag
        */
-
       echo '<h3>#' . $tag->index . ' ' . $tag->fulltag . '</h3>';
       echo '<table>';
       foreach ($tag as $name => $value) {
