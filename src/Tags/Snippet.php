@@ -4,18 +4,18 @@ namespace pinpie\pinpie\Tags;
 
 
 class Snippet extends Tag {
-  
+
   public function getOutput() {
     $time_start = microtime(true);
     $this->pinpie->totaltagsprocessed++;
     $this->filename = $this->getFilePath();
-    $this->pinpie->times[]=[microtime(true), 'Tag #' . $this->index . ' ' . $this->tagpath . ' started processing'];
+    $this->pinpie->times[] = [microtime(true), 'Tag #' . $this->index . ' ' . $this->tagpath . ' started processing'];
     if (!$this->doChecks()) {
       return '';
     }
     $content = $this->draw();
     $this->time['processing'] = microtime(true) - $time_start;
-    $this->pinpie->times[]=[microtime(true), 'Tag #' . $this->index . ' ' . $this->tagpath . ' finished processing'];
+    $this->pinpie->times[] = [microtime(true), 'Tag #' . $this->index . ' ' . $this->tagpath . ' finished processing'];
     return $content;
   }
 
@@ -69,7 +69,7 @@ class Snippet extends Tag {
       ) {
         $this->action = 'processed';
         $content = $this->render();
-        $this->pinpie->times[]=[microtime(true), 'Tag #' . $this->index . ' ' . $this->tagpath . ' finished rendering'];
+        $this->pinpie->times[] = [microtime(true), 'Tag #' . $this->index . ' ' . $this->tagpath . ' finished rendering'];
         // Fresh new content, have to put into the cache.
         // To clean list of files from empty entries I use array_filter(array_keys($this->collectFiles()))].
         if ($this->pinpie->cacher->set($this, ['fulltag' => $this->fulltag, 'content' => $content, 'vars' => $this->vars, 'time' => time(), 'files' => array_filter(array_keys($this->collectFiles()))], $this->cachetime)) {
@@ -79,7 +79,7 @@ class Snippet extends Tag {
           // CAN'T SAVE
           $this->error('can`t put content to cache');
         }
-        $this->pinpie->times[]=[microtime(true), 'Tag #' . $this->index . ' ' . $this->tagpath . ' finished caching'];
+        $this->pinpie->times[] = [microtime(true), 'Tag #' . $this->index . ' ' . $this->tagpath . ' finished caching'];
       } else {
         //обновлять не надо, файл старый, берём из кеша и усё
         $this->action = 'from cache';
@@ -100,7 +100,7 @@ class Snippet extends Tag {
     if (!empty($this->settings['folder'])) {
       $folder = $this->settings['folder'];
     }
-    return $folder . DIRECTORY_SEPARATOR . trim(str_replace($this->name, '\\','/'), '\\/') . '.php';
+    return $folder . DIRECTORY_SEPARATOR . trim(str_replace('\\', '/', $this->name), '\\/') . '.php';
   }
 
   protected function cacheCheckTime($cached) {
