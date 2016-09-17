@@ -13,10 +13,9 @@ class Cacher {
   public function __construct(PP $pinpie, $settings = []) {
     $this->pinpie = $pinpie;
     $defaults = [];
-    $defaults['servers'] = [];
     $defaults['algo'] = 'sha1';
     $defaults['random stuff'] = '';
-    $defaults['raw hash'] = '';
+    $defaults['raw hash'] = false;
     $this->settings = array_merge($defaults, $settings);
   }
 

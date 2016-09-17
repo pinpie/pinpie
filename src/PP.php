@@ -49,7 +49,7 @@ class PP {
 
   protected function Init() {
     $this->url = parse_url($_SERVER['REQUEST_URI']);
-    $this->document = $this->getDocument($this->url['path']);
+    $this->document = $this->findPageFile($this->url['path']);
     if ($this->document === false) {
       //requested url not found
       http_response_code(404);
@@ -71,11 +71,11 @@ class PP {
     $this->times[] = [microtime(true), 'PinPIE Init done'];
   }
 
-  protected $getDocumentRecur = 0;
+  protected $findPageFileRecur = 0;
 
-  protected function getDocument($url) {
-    $this->getDocumentRecur++;
-    if ($this->getDocumentRecur > $this->conf->pinpie['route to parent']) {
+  public function findPageFile($url) {
+    $this->findPageFileRecur++;
+    if ($this->findPageFileRecur > $this->conf->pinpie['route to parent']) {
       return false;
     }
     if (empty($url)) {
@@ -112,7 +112,7 @@ class PP {
         //Third step. If $this->conf->route_to_parent is set greater than zero, will look for nearest parent. Mean "/pages/ololo/ajaja/index.php" if not exist, goes to"/pages/ololo.php" or "/pages/ololo/index.php". (BUT NOT "/pages/index.php" anyway)
         if ($this->conf->pinpie['route to parent'] > 0) {
           unset($url[count($url) - 1]);
-          $doc = $this->getDocument($url);
+          $doc = $this->findPageFile($url);
         }
       }
     }

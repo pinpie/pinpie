@@ -15,6 +15,8 @@ class Memcache extends Cacher {
 
   public function __construct(PP $pinpie, array $settings) {
     parent::__construct($pinpie, $settings);
+    $defaults['servers'] = [];
+    $this->settings = array_merge($defaults, $this->settings);
     $this->mc = new \Memcache();
     foreach ($this->settings['servers'] as $server) {
       $this->mc->addServer($server['host'], $server['port']);

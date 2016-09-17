@@ -8,18 +8,21 @@ use pinpie\pinpie\Cachers\Cacher;
 class PinPIE {
   /** @var null|PP */
   public static $pinpie = null;
-  public static $template = null;
   /** @var null|pinpie\pinpie\CFG */
   public static $conf = null;
-  public static $document = null;
+  public static $url = null,
+    $document = null,
+    $template = null;
+
 
   public static function newInstance($page = false) {
     try {
       $pinpie = new \pinpie\pinpie\PP();
       static::$pinpie = &$pinpie;
-      static::$template = &$pinpie->template;
       static::$conf = &$pinpie->conf;
+      static::$url = &$pinpie->url;
       static::$document = &$pinpie->document;
+      static::$template = &$pinpie->template;
       if ($page) {
         $pinpie->document = $page;
       }
@@ -69,6 +72,10 @@ class PinPIE {
 
   public static function checkPathIsInFolder($path, $folder) {
     return static::$pinpie->checkPathIsInFolder($path, $folder);
+  }
+
+  public function findPageFile($url) {
+    return static::$pinpie->findPageFile($url);
   }
 
   private function __constructor() {

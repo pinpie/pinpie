@@ -11,12 +11,12 @@ class CFG {
     $static_servers = null,
     $databases = null,
     $showtime = null,
-    /** @var PP|null */
+    /** @var \pinpie\pinpie\PP|null */
     $pinpie = null,
     $debug = null,
     $tags = [];
 
-  public function __construct($pinpie) {
+  public function __construct(\pinpie\pinpie\PP $pinpie) {
     $this->pinpie = $pinpie;
   }
 
@@ -33,7 +33,7 @@ class CFG {
 
     //Loading defaults
     $pinpie = [
-      'cache class' => false,
+      'cache class' => '\pinpie\pinpie\Cachers\Files',
       'cache forever time' => PHP_INT_MAX,
       'cache rules' => [
         'default' => ['ignore url' => false, 'ignore query params' => []],
@@ -48,9 +48,9 @@ class CFG {
       'page not found' => 'index.php',
       'route to parent' => 1, //read doc. if exact file not found, instead of 404, PinPIE will try to route request to nearest existing parent entry in url. Default is 1, it means PinPIE will handle "site.com/url" and "site.com/url/" as same page.
       'site url' => $_SERVER['SERVER_NAME'],
-      'template clear vars after use' => false,
+      'templates clear vars after use' => false,
       'templates folder' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'templates',
-      'template function' => false,
+      'templates function' => false,
       'templates realpath check' => true,
       'preinclude' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'preinclude.php',
       'postinclude' => $this->pinpie->root . DIRECTORY_SEPARATOR . 'postinclude.php',

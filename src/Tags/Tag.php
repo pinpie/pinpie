@@ -159,10 +159,10 @@ class Tag {
   protected function applyTemplate() {
     $output = $this->content;
     if (!empty($this->template)) {
-      if ($this->pinpie->conf->pinpie['template function']) {
-        $this->pinpie->times[]=[microtime(true), 'Tag #' . $this->index . ' calling external template function'];
-        $this->pinpie->conf->pinpie['template function'](this);
-        $this->pinpie->times[]=[microtime(true),'Tag #' . $this->index . ' finished external template function'];
+      if ($this->pinpie->conf->pinpie['templates function']) {
+        $this->pinpie->times[]=[microtime(true), 'Tag #' . $this->index . ' calling external templates function'];
+        $this->pinpie->conf->pinpie['templates function'](this);
+        $this->pinpie->times[]=[microtime(true),'Tag #' . $this->index . ' finished external templates function'];
       } else {
         $this->pinpie->times[]=[microtime(true), 'Tag #' . $this->index . ' ' . $this->tagpath . ' begin parsing template'];
         $this->getTemplateFilename();
@@ -262,7 +262,7 @@ class Tag {
         $var = [];
         if (isset($this->pinpie->vars[$placeholder])) {
           $var = $this->pinpie->vars[$placeholder];
-          if ($this->pinpie->conf->pinpie['template clear vars after use']) {
+          if ($this->pinpie->conf->pinpie['templates clear vars after use']) {
             unset($this->pinpie->vars[$placeholder]);
           }
         }
