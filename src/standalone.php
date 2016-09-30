@@ -18,5 +18,3 @@ spl_autoload_register(function ($class) {
   return true;
 });
 
-class_alias('\pinpie\pinpie\PinPIE', 'PinPIE');
-PinPIE::newInstance();

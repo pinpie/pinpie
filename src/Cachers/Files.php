@@ -15,7 +15,6 @@ class Files extends Cacher {
 
   public function __construct(PP $pinpie, array $settings = []) {
     parent::__construct($pinpie, $settings);
-    
     $defaults = [];
     $defaults['path'] = $this->pinpie->root . DIRECTORY_SEPARATOR . 'filecache';
     $this->settings = array_merge($defaults, $this->settings);
@@ -54,7 +53,11 @@ class Files extends Cacher {
       return false;
     }
     $data = serialize($data);
-    return file_put_contents($fp, $data);
+    return (bool)file_put_contents($fp, $data);
+  }
+
+  public function getOK(){
+    return $this->ok;
   }
 
 }

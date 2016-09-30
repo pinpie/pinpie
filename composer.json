@@ -13,7 +13,11 @@
     }
   ],
   "require": {
-    "php": ">=5.4.0"
+    "php": ">=5.4.0",
+    "atoum/atoum": "2.8.2",
+    "atoum/stubs": "2.5.0"
+  },
+  "require-dev": {
   },
   "autoload": {
     "psr-4": {

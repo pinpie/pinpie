@@ -2,34 +2,30 @@
 
 namespace pinpie\pinpie;
 
-
-use pinpie\pinpie\Cachers\Cacher;
-
 class PinPIE {
   /** @var null|PP */
   public static $pinpie = null;
-  /** @var null|pinpie\pinpie\CFG */
+  /** @var null|CFG */
   public static $conf = null;
   public static $url = null,
     $document = null,
     $template = null;
 
 
-  public static function newInstance($page = false) {
+  public static function newInstance($settings = false) {
     try {
-      $pinpie = new \pinpie\pinpie\PP();
+      $pinpie = new PP($settings);
       static::$pinpie = &$pinpie;
       static::$conf = &$pinpie->conf;
       static::$url = &$pinpie->url;
       static::$document = &$pinpie->document;
       static::$template = &$pinpie->template;
-      if ($page) {
-        $pinpie->document = $page;
-      }
       echo $pinpie->render();
     } catch (NewPageException $np) {
+      var_dump($np);
       ob_clean();
-      static::newInstance($np->page);
+      $settings['page'] = $np->page;
+      static::newInstance($settings);
     }
   }
 
@@ -39,7 +35,7 @@ class PinPIE {
 
 
   public static function parseString($string) {
-    static::$pinpie->parseTags($string);
+    static::$pinpie->parseString($string);
   }
 
   public static function report() {
@@ -66,7 +62,7 @@ class PinPIE {
     return static::$pinpie->cacher;
   }
 
-  public static function cacherSet(Cacher $cacher) {
+  public static function cacherSet(Cachers\Cacher $cacher) {
     static::$pinpie->cacher = $cacher;
   }
 

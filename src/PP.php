@@ -32,24 +32,41 @@ class PP {
   /* one pinpie instance cache for other classes */
   public $inCa = [];
 
-  public function __construct() {
+  public function __construct($settings = false) {
     $this->startTime = microtime(true);
     $this->startMemory = memory_get_peak_usage();
     $this->times[] = [$this->startTime, 'Starting'];
-    $this->root = rtrim(str_replace('\\', '/', dirname($_SERVER["SCRIPT_FILENAME"])), DIRECTORY_SEPARATOR);
-    $configFile = $this->root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . basename($_SERVER['SERVER_NAME']) . '.php';
-    $this->initConfig($configFile);
-    $this->Init();
+    if (empty($_SERVER['SERVER_NAME'])) {
+      $_SERVER['SERVER_NAME'] = '';
+    }
+    if (empty($_SERVER['REQUEST_URI'])) {
+      $_SERVER['REQUEST_URI'] = '';
+    }
+    if (empty($settings['root'])) {
+      $this->root = rtrim(str_replace('\\', '/', dirname($_SERVER["SCRIPT_FILENAME"])), DIRECTORY_SEPARATOR);
+    } else {
+      $this->root = $settings['root'];
+    }
+    if (empty($settings['file'])) {
+      $settings['file'] = $this->root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . basename($_SERVER['SERVER_NAME']) . '.php';
+    }
+    $this->initConfig($settings);
+    $this->Init($settings);
   }
 
-  protected function initConfig($config) {
+  protected function initConfig($settings) {
     $this->conf = new CFG($this);
-    $this->conf->readConf($config);
+    $this->conf->setSettings($settings);
   }
 
-  protected function Init() {
+  protected function Init($settings) {
     $this->url = parse_url($_SERVER['REQUEST_URI']);
-    $this->document = $this->findPageFile($this->url['path']);
+    if (empty($settings['page'])) {
+      $this->document = $this->findPageFile($this->url['path']);
+    } else {
+      $this->document = $settings['page'];
+    }
+
     if ($this->document === false) {
       //requested url not found
       http_response_code(404);
@@ -75,6 +92,7 @@ class PP {
 
   public function findPageFile($url) {
     $this->findPageFileRecur++;
+
     if ($this->findPageFileRecur > $this->conf->pinpie['route to parent']) {
       return false;
     }
@@ -167,7 +185,7 @@ class PP {
     return ob_get_clean();
   }
 
-  public function parseTags($content, $parent = null) {
+  public function parseString($content, $parent = null) {
     if (empty($parent)) {
       $this->tagPath[] = '/';
     } else {
@@ -386,12 +404,11 @@ class PP {
     if (is_array($this->conf->pinpie['cache rules'][$ruleID])) {
       $rules = array_merge($defaults, $this->conf->pinpie['cache rules'][$ruleID]);
     }
-    $url = $this->url;
+    $url = array_merge(['path' => '', 'query' => ''], $this->url);
     //Check, if we have to use 'path' part of url, so caching could be done separately for each page
     if ($rules['ignore url']) {
       $url['path'] = '';
     }
-    $url = array_merge(['query' => ''], $url);
     //Should we ignore all (true) or some (array) of get-params of url, or make it separately. Mean cache of "?page=3" differs from "?page=100".
     if ($rules['ignore query params'] === true) {
       $url['query'] = '';

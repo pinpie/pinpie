@@ -25,7 +25,7 @@ class Tag {
     $index = 0,
     $name = '',
     $output = '',
-    $params = '',
+    $params = [],
     /** @var Tag|null */
     $parent = null,
     $parents = [],
@@ -143,7 +143,7 @@ class Tag {
   protected function render() {
     $this->action = 'processed nocache';
     $this->content = $this->getContent();
-    $this->content = $this->pinpie->parseTags($this->content, $this);
+    $this->content = $this->pinpie->parseString($this->content, $this);
     //Apply template to tag content
     if (!empty($this->template)) {
       $this->output = $this->applyTemplate();
@@ -167,7 +167,7 @@ class Tag {
         $this->pinpie->times[]=[microtime(true), 'Tag #' . $this->index . ' ' . $this->tagpath . ' begin parsing template'];
         $this->getTemplateFilename();
         $templateContent = $this->getTemplateContent();
-        $templateContent = $this->pinpie->parseTags($templateContent, $this);
+        $templateContent = $this->pinpie->parseString($templateContent, $this);
         $this->varsLocal['content'][0][] = $this->content;
         $output = $this->expandVars($templateContent);
       }
@@ -198,6 +198,9 @@ class Tag {
 
   protected function error($text) {
     $this->pinpie->errors[$this->index][] = $this->errors[] = $text;
+    if (empty($_SERVER['REQUEST_URI'])){
+      $_SERVER['REQUEST_URI'] = '';
+    }
     $this->pinpie->logit("Tag processing failed
     url: {$_SERVER['REQUEST_URI']}
     tag: {$this->fulltag} in {$this->tagpath}
