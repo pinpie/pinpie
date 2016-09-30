@@ -2,5 +2,9 @@ language: php
 php:
   - '5.4'
 
-before_script: composer require atoum/atoum
+before_script:
+  - composer require atoum/atoum
+  - yes '' | pecl install apcu
+  - phpenv config-add tests/apc.ini
+
 script: vendor/bin/atoum -c tests/.atoum.php

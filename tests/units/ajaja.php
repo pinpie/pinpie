@@ -17,6 +17,7 @@ class PP extends atoum {
       'file' => false,
       'pinpie' => [
         'route to parent' => 100,
+        'cache class' => '\pinpie\pinpie\Cachers\Disabled',
       ],
     ];
 
@@ -57,11 +58,13 @@ class PP extends atoum {
       $this->testedInstance = new \pinpie\pinpie\PP();
     }
 
+
     $settings = [
-      'root' => realpath(__DIR__ . '/../filetests/chunks'),
+      'root' => realpath(__DIR__ . '/../filetests/pages'),
       'file' => false,
       'pinpie' => [
         'route to parent' => 100,
+        'cache class' => '\pinpie\pinpie\Cachers\Disabled',
       ],
     ];
 
@@ -149,11 +152,13 @@ class PP extends atoum {
       $this->testedInstance = new \pinpie\pinpie\PP();
     }
 
+
     $settings = [
-      'root' => realpath(__DIR__ . '/../filetests/tagtemplates'),
+      'root' => realpath(__DIR__ . '/../filetests/pages'),
       'file' => false,
       'pinpie' => [
         'route to parent' => 100,
+        'cache class' => '\pinpie\pinpie\Cachers\Disabled',
       ],
     ];
 
