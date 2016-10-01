@@ -8,7 +8,7 @@ use \pinpie\pinpie\Tags\Tag;
 class APC extends Cacher {
   protected $bc = false;
 
-  public function __construct(PP $pinpie, array $settings) {
+  public function __construct(PP $pinpie, array $settings = []) {
     if (function_exists('apc_fetch')) {
       $this->bc = true;
     }
