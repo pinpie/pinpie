@@ -11,7 +11,7 @@ before_script:
   - composer require atoum/atoum
   - if [[ "$(php -v | grep 'PHP 5')" ]]; then echo yes | pecl install apcu-4.0.8; fi
   - if [[ "$(php -v | grep 'PHP 7')" ]]; then echo yes | pecl install apcu; fi
-  - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  #- echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - phpenv config-add tests/apc.ini
 
 script: vendor/bin/atoum -c tests/.atoum.php
