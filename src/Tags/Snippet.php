@@ -5,7 +5,8 @@ namespace pinpie\pinpie\Tags;
 
 class Snippet extends Tag {
 
-  public function getOutput() {
+
+	public function getOutput() {
     $time_start = microtime(true);
     $this->pinpie->totaltagsprocessed++;
     $this->filename = $this->getFilePath();
