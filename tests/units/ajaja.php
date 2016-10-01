@@ -106,11 +106,13 @@ class PP extends atoum {
       $this->testedInstance = new \pinpie\pinpie\PP();
     }
 
+
     $settings = [
-      'root' => realpath(__DIR__ . '/../filetests/snippets'),
+      'root' => realpath(__DIR__ . '/../filetests/tagtemplates'),
       'file' => false,
       'pinpie' => [
         'route to parent' => 100,
+        'cache class' => '\pinpie\pinpie\Cachers\Disabled',
       ],
     ];
 
