@@ -58,7 +58,6 @@ class PP extends atoum {
       $this->testedInstance = new \pinpie\pinpie\PP();
     }
 
-
     $settings = [
       'root' => realpath(__DIR__ . '/../filetests/pages'),
       'file' => false,
@@ -108,7 +107,7 @@ class PP extends atoum {
 
 
     $settings = [
-      'root' => realpath(__DIR__ . '/../filetests/tagtemplates'),
+      'root' => realpath(__DIR__ . '/../filetests/snippets'),
       'file' => false,
       'pinpie' => [
         'route to parent' => 100,
