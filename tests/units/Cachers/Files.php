@@ -30,8 +30,15 @@ class Files extends atoum {
       return false;
     };
 
+    $settings = [
+      'file' => false,
+      'pinpie' => [
+        'cache class' => '\pinpie\pinpie\Cachers\Disabled',
+      ],
+    ];
+
     /** @var \pinpie\pinpie\PP $pp */
-    $pp = new \mock\pinpie\pinpie\PP();
+    $pp = new \mock\pinpie\pinpie\PP($settings);
     $url = ['url path' => '', 'url query' => ''];
     $this->calling($pp)->getHashURL = $url;
     /** @var \pinpie\pinpie\Tags\Tag $tag */
@@ -124,8 +131,15 @@ class Files extends atoum {
       /* IDE autocomplete */
       $this->testedInstance = new \pinpie\pinpie\Cachers\Files();
     }
+    $settings = [
+      'file' => false,
+      'pinpie' => [
+        'cache class' => '\pinpie\pinpie\Cachers\Disabled',
+      ],
+    ];
+
     /** @var \pinpie\pinpie\PP $pp */
-    $pp = new \mock\pinpie\pinpie\PP();
+    $pp = new \mock\pinpie\pinpie\PP($settings);
     $url = ['url path' => '', 'url query' => ''];
     $this->calling($pp)->getHashURL = $url;
     $_SERVER['SERVER_NAME'] = 'test';

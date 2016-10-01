@@ -10,7 +10,7 @@ class Tag extends atoum {
     if (false) {
       $this->testedInstance = new \pinpie\pinpie\Tags\Tag();
     }
-    $settings = [];
+    $tagsettings = [];
     $fulltag = 'fulltag';
     $type = 'type';
     $placeholder = 'placeholder';
@@ -21,14 +21,21 @@ class Tag extends atoum {
     $priority = 10;
     $depth = 20;
 
+    $settings = [
+      'file' => false,
+      'pinpie' => [
+        'cache class' => '\pinpie\pinpie\Cachers\Disabled',
+      ],
+    ];
+
     /** @var \pinpie\pinpie\PP $pp */
-    $pp = new \mock\pinpie\pinpie\PP();
+    $pp = new \mock\pinpie\pinpie\PP($settings);
 
     /* __construct(PP $pinpie, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, Tag $parentTag = null, $priority = 10000, $depth = 0) */
 
     $this
       ->assert('Creating tag, no parent')
-      ->given($this->newTestedInstance($pp, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parentTag, $priority, $depth))
+      ->given($this->newTestedInstance($pp, $tagsettings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parentTag, $priority, $depth))
       ->then
       ->string($this->testedInstance->fulltag)->isIdenticalTo($fulltag)
       ->string($this->testedInstance->type)->isIdenticalTo($type)
@@ -46,7 +53,7 @@ class Tag extends atoum {
       ->assert('Creating tag with params, no parent')
       ->and($params = ['a' => 'aa', 'b' => 'bb'])
       ->and($fullnameWithParams = $fullname . '?' . http_build_query($params))
-      ->given($this->newTestedInstance($pp, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullnameWithParams, $parentTag, $priority, $depth))
+      ->given($this->newTestedInstance($pp, $tagsettings, $fulltag, $type, $placeholder, $template, $cachetime, $fullnameWithParams, $parentTag, $priority, $depth))
       ->then
       ->string($this->testedInstance->fulltag)->isIdenticalTo($fulltag)
       ->string($this->testedInstance->type)->isIdenticalTo($type)
@@ -67,7 +74,7 @@ class Tag extends atoum {
 
     $this
       ->assert('Creating tag with parent')
-      ->given($this->newTestedInstance($pp, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $tag, $priority, $depth))
+      ->given($this->newTestedInstance($pp, $tagsettings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $tag, $priority, $depth))
       ->then
       ->string($this->testedInstance->fulltag)->isIdenticalTo($fulltag)
       ->string($this->testedInstance->type)->isIdenticalTo($type)
@@ -81,7 +88,6 @@ class Tag extends atoum {
       ->then;
 
   }
-
 
 
 }

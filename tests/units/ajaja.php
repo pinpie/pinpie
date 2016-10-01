@@ -154,7 +154,7 @@ class PP extends atoum {
 
 
     $settings = [
-      'root' => realpath(__DIR__ . '/../filetests/pages'),
+      'root' => realpath(__DIR__ . '/../filetests/tagtemplates'),
       'file' => false,
       'pinpie' => [
         'route to parent' => 100,

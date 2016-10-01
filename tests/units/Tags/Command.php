@@ -8,8 +8,15 @@ class Command extends atoum {
 
 
   public function test_unknown() {
+    $settings = [
+      'file' => false,
+      'pinpie' => [
+        'cache class' => '\pinpie\pinpie\Cachers\Disabled',
+      ],
+    ];
+
     /** @var \pinpie\pinpie\PP $pp */
-    $pp = new \mock\pinpie\pinpie\PP();
+    $pp = new \mock\pinpie\pinpie\PP($settings);
     $this
       ->assert('Unknown command')
       ->if($pp->parseString('[[@unknowncmd]]'))
@@ -19,8 +26,15 @@ class Command extends atoum {
   }
 
   public function test_template() {
+    $settings = [
+      'file' => false,
+      'pinpie' => [
+        'cache class' => '\pinpie\pinpie\Cachers\Disabled',
+      ],
+    ];
+
     /** @var \pinpie\pinpie\PP $pp */
-    $pp = new \mock\pinpie\pinpie\PP();
+    $pp = new \mock\pinpie\pinpie\PP($settings);
 
     $this
       ->assert('Template')

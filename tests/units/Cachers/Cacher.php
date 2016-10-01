@@ -7,8 +7,15 @@ use atoum;
 class Cacher extends atoum {
 
   public function test2() {
+    $settings = [
+      'file' => false,
+      'pinpie' => [
+        'cache class' => '\pinpie\pinpie\Cachers\Disabled',
+      ],
+    ];
+
     /** @var \pinpie\pinpie\PP $pp */
-    $pp = new \mock\pinpie\pinpie\PP();
+    $pp = new \mock\pinpie\pinpie\PP($settings);
     $url = ['url path' => '', 'url query' => ''];
     $this->calling($pp)->getHashURL = $url;
     /** @var \pinpie\pinpie\Tags\Tag $tag */

@@ -11,8 +11,15 @@ class Constant extends atoum {
     if (false) {
       $this->testedInstance = new \pinpie\pinpie\Tags\Constant();
     }
+        $settings = [
+      'file' => false,
+      'pinpie' => [
+        'cache class' => '\pinpie\pinpie\Cachers\Disabled',
+      ],
+    ];
+
     /** @var \pinpie\pinpie\PP $pp */
-    $pp = new \mock\pinpie\pinpie\PP();
+    $pp = new \mock\pinpie\pinpie\PP($settings);
 
     $this
       ->assert('Simple')
