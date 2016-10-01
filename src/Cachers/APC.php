@@ -2,7 +2,8 @@
 
 namespace pinpie\pinpie\Cachers;
 
-use pinpie\pinpie\Tags\Tag;
+use \pinpie\pinpie\PP;
+use \pinpie\pinpie\Tags\Tag;
 
 class APC extends Cacher {
   protected $bc = false;

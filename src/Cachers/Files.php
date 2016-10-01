@@ -2,7 +2,6 @@
 namespace pinpie\pinpie\Cachers;
 
 
-use \pinpie\pinpie\Cachers\Cacher;
 use \pinpie\pinpie\PP;
 use \pinpie\pinpie\Tags\Tag;
 
