@@ -7,4 +7,12 @@
 
 PinPIE это лёгкий движок для небольших сайтов.
 
+
+
+```
+composer require "pinpie/pinpie"
+composer install
+```
+
+
 [Подробнее на сайте PinPIE](http://pinpie.ru/ru/manual).
