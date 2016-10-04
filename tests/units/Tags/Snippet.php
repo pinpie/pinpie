@@ -129,7 +129,7 @@ class Snippet extends atoum {
 			'root' => realpath(__DIR__ . '/../../filetests/snippets'),
 			'file' => false,
 			'pinpie' => [
-				'cache class' => '\pinpie\pinpie\Cachers\APC',
+				'cache class' => '\pinpie\pinpie\Cachers\APCu',
 			],
 		];
 

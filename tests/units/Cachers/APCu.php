@@ -5,7 +5,7 @@ namespace pinpie\pinpie\Cachers\tests\units;
 use atoum;
 use mageekguy\atoum\php\tokenizer\iterator\value;
 
-class APC extends atoum {
+class APCu extends atoum {
 
   public function test() {
     $settings = [

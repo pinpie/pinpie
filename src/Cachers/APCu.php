@@ -5,7 +5,7 @@ namespace pinpie\pinpie\Cachers;
 use \pinpie\pinpie\PP;
 use \pinpie\pinpie\Tags\Tag;
 
-class APC extends Cacher {
+class APCu extends Cacher {
   protected $bc = false;
 
   public function __construct(PP $pinpie, array $settings = []) {
@@ -31,7 +31,6 @@ class APC extends Cacher {
     } else {
       return apcu_store($hash, $data, $time);
     }
-
   }
 
 }

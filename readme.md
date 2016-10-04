@@ -5,3 +5,6 @@
 [![License](https://poser.pugx.org/pinpie/pinpie/license)](https://packagist.org/packages/pinpie/pinpie)
 
 
+PinPIE это лёгкий движок для небольших сайтов.
+
+[Подробнее на сайте PinPIE](http://pinpie.ru/ru/manual).

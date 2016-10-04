@@ -15,7 +15,7 @@ class Files extends Cacher {
   public function __construct(PP $pinpie, array $settings = []) {
     parent::__construct($pinpie, $settings);
     $defaults = [];
-    $defaults['path'] = $this->pinpie->root . DIRECTORY_SEPARATOR . 'filecache';
+    $defaults['path'] = $this->pinpie->conf->root . DIRECTORY_SEPARATOR . 'filecache';
     $this->settings = array_merge($defaults, $this->settings);
     $this->path = rtrim($this->settings['path'], '\\/') . DIRECTORY_SEPARATOR;
     if (!is_dir($this->path)) {
