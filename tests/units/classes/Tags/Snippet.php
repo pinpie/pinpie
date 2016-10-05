@@ -13,7 +13,7 @@ class Snippet extends atoum {
 		}
 
 		$settings = [
-			'root' => realpath(__DIR__ . '/../../filetests/snippets'),
+			'root' => realpath(__DIR__ . '/../../../filetests/snippets'),
 			'file' => false,
 			'pinpie' => [
 				'cache class' => '\pinpie\pinpie\Cachers\Disabled',
@@ -126,7 +126,7 @@ class Snippet extends atoum {
 		}
 
 		$settings = [
-			'root' => realpath(__DIR__ . '/../../filetests/snippets'),
+			'root' => realpath(__DIR__ . '/../../../filetests/snippets'),
 			'file' => false,
 			'pinpie' => [
 				'cache class' => '\pinpie\pinpie\Cachers\APCu',

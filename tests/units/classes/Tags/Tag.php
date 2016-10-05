@@ -98,6 +98,5 @@ class Tag extends atoum {
 			->then;
 
 	}
-
-
 }
+

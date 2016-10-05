@@ -68,11 +68,15 @@ class Staticon extends Tag {
 			}
 
 			$this->filetime = $this->pinpie->filemtime($this->filename);
-			$this->staticHash = md5($this->filename . '*' . $this->filetime);
+			$this->staticHash = $this->getStaticHash();
 		}
 		$this->pinpie->times[] = [microtime(true), 'getStaticUrl'];
 		$this->url = $this->getStaticUrl();
 		$this->pinpie->times[] = [microtime(true), 'getStaticUrl done'];
+	}
+
+	public function getStaticHash() {
+		return md5($this->filename . '*' . $this->filetime);
 	}
 
 	public function getStaticUrl() {
@@ -302,7 +306,6 @@ class Staticon extends Tag {
 		}
 		$this->pinpie->times[] = [microtime(true), 'drawn'];
 		if (!empty($this->template)) {
-			$this->varsLocal['content'][0][] = $this->content;
 			if (isset($this->dimensions['width'])) {
 				$this->varsLocal['width'][0][] = $this->dimensions['width'];
 			}

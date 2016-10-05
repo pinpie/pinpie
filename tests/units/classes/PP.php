@@ -13,7 +13,7 @@ class PP extends atoum {
     }
 
     $settings = [
-      'root' => realpath(__DIR__ . '/../filetests/pages'),
+      'root' => realpath(__DIR__ . '/../../filetests/pages'),
       'file' => false,
       'pinpie' => [
         'route to parent' => 100,
@@ -59,7 +59,7 @@ class PP extends atoum {
     }
 
     $settings = [
-      'root' => realpath(__DIR__ . '/../filetests/pages'),
+      'root' => realpath(__DIR__ . '/../../filetests/pages'),
       'file' => false,
       'pinpie' => [
         'route to parent' => 100,
@@ -107,7 +107,7 @@ class PP extends atoum {
 
 
     $settings = [
-      'root' => realpath(__DIR__ . '/../filetests/snippets'),
+      'root' => realpath(__DIR__ . '/../../filetests/snippets'),
       'file' => false,
       'pinpie' => [
         'route to parent' => 100,
@@ -155,7 +155,7 @@ class PP extends atoum {
 
 
     $settings = [
-      'root' => realpath(__DIR__ . '/../filetests/tagtemplates'),
+      'root' => realpath(__DIR__ . '/../../filetests/tagtemplates'),
       'file' => false,
       'pinpie' => [
         'route to parent' => 100,

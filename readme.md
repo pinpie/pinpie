@@ -1,3 +1,4 @@
+#PinPIE - when PHP Is Enough
 
 [![Build Status](https://travis-ci.org/pinpie/pinpie.svg?branch=dev)](https://travis-ci.org/pinpie/pinpie)
 [![Latest Stable Version](https://poser.pugx.org/pinpie/pinpie/v/stable)](https://packagist.org/packages/pinpie/pinpie)

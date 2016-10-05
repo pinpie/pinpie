@@ -4,7 +4,8 @@ namespace pinpie\pinpie\Tags;
 
 
 class Constant extends Tag {
-  protected function getContent() {
+
+	protected function getContent() {
     return $this->fullname;
   }
 

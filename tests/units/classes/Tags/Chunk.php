@@ -12,7 +12,7 @@ class Chunk extends atoum {
 			$this->testedInstance = new \pinpie\pinpie\Tags\Chunk(null, [], 'fulltag', 'type', 'placeholder', 'template', 'cachetime', 'fullname');
 		}
 		$settings = [
-			'root' => realpath(__DIR__ . '/../../filetests/chunks'),
+			'root' => realpath(__DIR__ . '/../../../filetests/chunks'),
 			'file' => false,
 			'pinpie' => [
 				'cache class' => '\pinpie\pinpie\Cachers\Disabled',
