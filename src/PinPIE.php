@@ -35,19 +35,19 @@ class PinPIE {
 
 
   public static function parseString($string) {
-    static::$pinpie->parseString($string);
+    return static::$pinpie->parseString($string);
   }
 
   public static function report() {
-    static::$pinpie->report();
+    return static::$pinpie->report();
   }
 
   public static function reportTags() {
-    static::$pinpie->reportTags();
+    return static::$pinpie->reportTags();
   }
 
   public static function varPut($name, $content) {
-    static::$pinpie->vars[$name][100000][] = $content;
+    return static::$pinpie->vars[$name][100000][] = $content;
   }
 
   public static function templateGet() {
@@ -55,7 +55,7 @@ class PinPIE {
   }
 
   public static function templateSet($template) {
-    static::$pinpie->template = $template;
+    return static::$pinpie->template = $template;
   }
 
   public static function cacherGet() {
@@ -63,7 +63,7 @@ class PinPIE {
   }
 
   public static function cacherSet(Cachers\Cacher $cacher) {
-    static::$pinpie->cacher = $cacher;
+    return static::$pinpie->cacher = $cacher;
   }
 
   public static function checkPathIsInFolder($path, $folder) {

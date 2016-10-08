@@ -13,14 +13,14 @@ class CFG {
 		$oth = null,
 		$static_servers = null,
 		$databases = null,
-		$showtime = null,
 		/** @var \pinpie\pinpie\PP|null */
 		$root = null,
 		$pinpie = null,
 		$debug = null,
-		$tags = [];
+		$tags = [],
+		$file = false;
 
-	public function __construct($settings) {
+	public function __construct($settings = []) {
 		if (empty($settings['root'])) {
 			$this->root = rtrim(str_replace('\\', '/', dirname($_SERVER["SCRIPT_FILENAME"])), DIRECTORY_SEPARATOR);
 		} else {
@@ -37,30 +37,45 @@ class CFG {
 			if ($settings['file'] === true) {
 				$settings['file'] = $this->root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . basename($_SERVER['SERVER_NAME']) . '.php';
 			}
-			$fileconf = $this->readConfFile($settings['file']);
-			foreach ($fileconf as $k => $f) {
-				if (isset($settings[$k]) AND is_array($settings[$k])) {
-					$settings[$k] = array_merge($f, $settings[$k]);
-				} else {
-					$settings[$k] = $f;
-				}
-			}
+			$settings = $this->settingsMerge($this->readConfFile($settings['file']), $settings);
 		}
-		foreach ($defaults as $k => $d) {
-			if (isset($settings[$k]) AND is_array($settings[$k])) {
-				$settings[$k] = array_merge($d, $settings[$k]);
-			} else {
-				$settings[$k] = $d;
-			}
-		}
+		$settings = $this->settingsMerge($defaults, $settings);
 		$this->cache = $settings['cache'];
 		$this->oth = $settings['oth'];
 		$this->databases = $settings['databases'];
 		$this->static_servers = $settings['static_servers'];
-		$this->showtime = $settings['showtime'];
 		$this->pinpie = $settings['pinpie'];
 		$this->debug = $settings['debug'];
 		$this->tags = $settings['tags'];
+	}
+
+	/**
+	 * Merges settings arrays. Minor is overwritten by major.
+	 * @param array $minor settings array to be overwritten by $major
+	 * @param array $major settings that overwrites thous in $minor
+	 */
+	protected function settingsMerge($minor, $major) {
+		$settings = $minor;
+		foreach ($major as $k => $mj) {
+
+			if (is_array($mj) AND $this->is_assoc($mj) AND isset($settings[$k]) AND is_array($settings[$k])) {
+				$settings[$k] = $this->settingsMerge($settings[$k], $mj);
+			} else {
+				$settings[$k] = $mj;
+			}
+		}
+		return $settings;
+	}
+
+	/**
+	 * Checks if array is associative
+	 * @param $arr array
+	 * @return bool
+	 */
+	public function is_assoc($arr) {
+		if (!is_array($arr)) return false;
+		if (array() === $arr) return false;
+		return array_keys($arr) !== range(0, count($arr) - 1);
 	}
 
 	public function getDefaults() {
@@ -68,7 +83,6 @@ class CFG {
 		$oth = []; //you can put some custom setting here
 		$databases = []; //to store database settings
 		$static_servers = []; //list here static content servers addresses if you want to use them
-		$showtime = false; //show page generating time
 		$debug = false; //enables PinPIE::report() output. Use it to enable your own debug mode. Globally available through CFG::$debug.
 
 		//Loading defaults
@@ -132,7 +146,6 @@ class CFG {
 		$arr['oth'] = $oth; //you can use that array to store settings for your own scripts
 		$arr['databases'] = $databases;
 		$arr['static_servers'] = $static_servers;
-		$arr['showtime'] = $showtime;
 		$arr['pinpie'] = $pinpie;
 		$arr['debug'] = $debug;
 		$arr['tags'] = $tags;
@@ -148,13 +161,13 @@ class CFG {
 		$oth = $arr['oth'];
 		$databases = $arr['databases'];
 		$static_servers = $arr['static_servers'];
-		$showtime = $arr['showtime'];
 		$pinpie = $arr['pinpie'];
 		$debug = $arr['debug'];
 		$tags = $arr['tags'];
 		unset($arr);
 		//Reading file and overwriting defaults
 		if (file_exists($path)) {
+			$this->file = $path;
 			include($path);
 		}
 		$arr = [];
@@ -162,14 +175,12 @@ class CFG {
 		$arr['oth'] = $oth;
 		$arr['databases'] = $databases;
 		$arr['static_servers'] = $static_servers;
-		$arr['showtime'] = $showtime;
 		$arr['pinpie'] = $pinpie;
 		$arr['debug'] = $debug;
 		$arr['tags'] = $tags;
 		return $arr;
 	}
-
-
-	public function setSettings() {
-	}
 }
+
+
+

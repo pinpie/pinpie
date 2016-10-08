@@ -184,9 +184,6 @@ class PP {
 		if (!empty($this->conf->pinpie['postinclude']) AND file_exists($this->conf->pinpie['postinclude'])) {
 			include $this->conf->pinpie['postinclude'];
 		}
-		if ($this->conf->showtime) {
-			echo number_format((microtime(true) - $this->startTime) * 1000, 3, '.', '') . "ms";
-		}
 		return ob_get_clean();
 	}
 

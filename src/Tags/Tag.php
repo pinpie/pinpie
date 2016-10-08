@@ -142,7 +142,11 @@ class Tag {
 	protected function render() {
 		$this->action = 'processed nocache';
 		$this->content = $this->getContent();
-		$this->content = $this->pinpie->parseString($this->content, $this);
+		if ($this->template === false) {
+			// skipping parsing
+		} else {
+			$this->content = $this->pinpie->parseString($this->content, $this);
+		}
 		//Apply template to tag content
 		if (!empty($this->template)) {
 			$this->output = $this->applyTemplate();
