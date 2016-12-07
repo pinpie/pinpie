@@ -42,10 +42,11 @@ class Staticon extends atoum {
 			->and($placeholder = '')
 			->and($template = '')
 			->and($cachetime = '')
-			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']')
-			->given($this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname))
-			->then
-			->string($this->testedInstance->getOutput())
+			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']');
+		$this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname);
+		$out = $this->testedInstance->getOutput();
+		$this
+			->string($out)
 			->startWith('<script type="text/javascript" src="//site.com/js.js?time=')
 			->endWith('"></script>')
 			->matches('#^<script type="text\/javascript" src="\/\/site\.com\/js\.js\?time=[\d\w]+"><\/script>$#')
@@ -58,9 +59,9 @@ class Staticon extends atoum {
 			->and($placeholder = '')
 			->and($template = '')
 			->and($cachetime = '!')
-			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']')
-			->given($this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname))
-			->then
+			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']');
+		$this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname);
+		$this
 			->string($this->testedInstance->getOutput())
 			->startWith('//site.com/js.js?time=')
 			->then();
@@ -72,8 +73,9 @@ class Staticon extends atoum {
 			->and($placeholder = '')
 			->and($template = '')
 			->and($cachetime = '')
-			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']')
-			->given($this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname))
+			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']');
+		$this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname);
+		$this
 			->then
 			->if($out = $this->testedInstance->getOutput())
 			->string($out)
@@ -89,8 +91,9 @@ class Staticon extends atoum {
 			->and($placeholder = '')
 			->and($template = '')
 			->and($cachetime = '')
-			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']')
-			->given($this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname))
+			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']');
+		$this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname);
+		$this
 			->then
 			->if($out = $this->testedInstance->getOutput())
 			->string($out)
@@ -106,14 +109,15 @@ class Staticon extends atoum {
 			->and($placeholder = '')
 			->and($template = 'stattemplate')
 			->and($cachetime = '')
-			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']')
-			->given($this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname))
+			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']');
+		$this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname);
+		$this
 			->then
 			->if($out = $this->testedInstance->getOutput())
 			->and($shash = $this->testedInstance->getStaticHash())
 			->and($filename = $this->testedInstance->filename)
 			->and($filetime = $this->testedInstance->filetime)
 			->string($out)
-			->isEqualTo('start '.$filename . ' //site.com/2xtPK.png ' . $filetime . '  1000 1000 <img src="//site.com/2xtPK.png?time=' . $shash . '" width="1000" height="1000"> end');
+			->isEqualTo('start ' . $filename . ' //site.com/2xtPK.png ' . $filetime . '  1000 1000 <img src="//site.com/2xtPK.png?time=' . $shash . '" width="1000" height="1000"> end');
 	}
 }

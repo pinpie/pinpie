@@ -36,10 +36,19 @@ class Staticon extends Tag {
 			$this->error($fulltag . ' static file path is empty');
 		} else {
 			if ($this->staticPath{0} !== '/') {
-				$this->staticPath = rtrim($this->pinpie->url['path'], '/') . '/' . $this->staticPath;
+				$this->staticPath = rtrim($this->pinpie->url->path, '/') . '/' . $this->staticPath;
 			}
 		}
 
+		if (empty($this->settings['minify types'])) {
+			$this->settings['minify types'] = [];
+		}
+		if (empty($this->settings['gzip types'])) {
+			$this->settings['gzip types'] = [];
+		}
+		if (empty($this->settings['dimensions types'])) {
+			$this->settings['dimensions types'] = [];
+		}
 		$this->minifie = in_array($this->staticType, $this->settings['minify types']);
 		$this->gzip = in_array($this->staticType, $this->settings['gzip types']);
 		$this->pinpie->times[] = [microtime(true), '$this->filename = $this->getStaticPath();'];

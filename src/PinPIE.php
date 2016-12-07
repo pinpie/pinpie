@@ -18,12 +18,10 @@ class PinPIE {
       static::$pinpie = &$pinpie;
       static::$conf = &$pinpie->conf;
       static::$url = &$pinpie->url;
-      static::$document = &$pinpie->document;
       static::$template = &$pinpie->template;
       echo $pinpie->render();
     } catch (NewPageException $np) {
-      var_dump($np);
-      ob_clean();
+      ob_end_clean();
       $settings['page'] = $np->page;
       static::newInstance($settings);
     }
@@ -71,7 +69,7 @@ class PinPIE {
   }
 
   public function findPageFile($url) {
-    return static::$pinpie->findPageFile($url);
+    return static::$pinpie->getUrlInfo($url);
   }
 
   private function __constructor() {

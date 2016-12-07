@@ -10,10 +10,10 @@ class Page extends Snippet {
     if (!empty($this->settings['folder'])) {
       $folder = $this->settings['folder'];
     }
-    if (empty($this->pinpie->document)) {
+    if (empty($this->pinpie->url->file)) {
       return false;
     }
-    $this->filename = $this->pinpie->document;
+    $this->filename = $this->pinpie->url->file;
     return $folder . DIRECTORY_SEPARATOR . trim($this->filename, '\\/');
   }
 

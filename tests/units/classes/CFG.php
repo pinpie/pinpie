@@ -37,7 +37,7 @@ class CFG extends atoum {
 			->assert('file config another')
 			->if($_SERVER['SERVER_NAME'] = 'site.com')
 			->and($settings['root'] = realpath(__DIR__ . '/../../filetests/config'))
-			->and($settings['file'] = $settings['root'] . '/config/another.php')
+			->and($settings['file'] = realpath($settings['root'] . '/config/another.php'))
 			->then();
 		$this->newTestedInstance($settings);
 

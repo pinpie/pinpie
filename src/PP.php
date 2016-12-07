@@ -8,8 +8,9 @@ use pinpie\pinpie\Tags\Tag;
 class PP {
 	/** @var CFG | null */
 	public $conf = null;
+	/** @var null| URL */
+	public $url = null;
 	public
-		$url = ['path' => '/', 'query' => ''],
 		$document = null,
 		$template = 'default';
 	protected $tags = [];
@@ -42,7 +43,7 @@ class PP {
 			$_SERVER['REQUEST_URI'] = '';
 		}
 		$this->conf = new CFG($settings);
-		$this->document = $this->getDocument($settings);
+		$this->url = $this->getDocument($settings);
 		$this->Init();
 		$this->times[] = [microtime(true), 'PinPIE started'];
 	}
@@ -50,28 +51,25 @@ class PP {
 	/**
 	 * Decides what page should be loaded. In case of false - 404 code is set and "page not found" configuration entry is used.
 	 * @param $settings
-	 * @return bool|string
+	 * @return bool|URL
 	 */
 	protected function getDocument($settings) {
-		$document = false;
-		if (empty($settings['page'])) {
-			$this->url = parse_url($_SERVER['REQUEST_URI']);
-			$document = $this->findPageFile($this->url['path']);
-		} else {
-			$document = $settings['page'];
+		$url = $this->getUrlInfo($_SERVER['REQUEST_URI']);
+		if (!empty($settings['page'])) {
+			$url->file = $settings['page'];
 		}
-		if ($document === false) {
+		if ($url->file === false) {
 			//requested url not found
 			http_response_code(404);
-			$document = trim($this->conf->pinpie['page not found'], DIRECTORY_SEPARATOR);
+			$url->file = trim($this->conf->pinpie['page not found'], DIRECTORY_SEPARATOR);
 		}
-		return $document;
+		return $url;
 	}
 
 	protected function Init() {
 		if (!empty($this->conf->tags['PAGE']['class'])) {
 			$pageclass = $this->conf->tags['PAGE']['class'];
-			$page = new $pageclass($this, $this->conf->tags['PAGE'], 'PAGE ' . $this->document, 'PAGE', '', $this->template, 0, '', null, 10000, 0);
+			$page = new $pageclass($this, $this->conf->tags['PAGE'], 'PAGE ' . $this->url->file, 'PAGE', '', $this->template, 0, '', null, 10000, 0);
 			$this->template = &$page->template;
 			$this->tags[] = $page;
 			$this->page = $page;
@@ -84,58 +82,14 @@ class PP {
 		}
 	}
 
-	protected $findPageFileRecur = 0;
 
 	/**
-	 * Looks for corresponding file by provided url path. Returns path to page file or false on fail.
+	 * Looks for corresponding file by provided url path. Returns URL instance or false on fail.
 	 * @param $url
-	 * @return bool|string
+	 * @return bool|\pinpie\pinpie\URL
 	 */
-	public function findPageFile($url) {
-		$this->findPageFileRecur++;
-
-		if ($this->findPageFileRecur > $this->conf->pinpie['route to parent']) {
-			return false;
-		}
-		if (empty($url)) {
-			return false;
-		}
-		$doc = false;
-		/////////////////////////////////////////////////////////
-		if (is_array($url)) {
-			$surl = implode(DIRECTORY_SEPARATOR, $url);
-		} else {
-			$url = trim((string)$url, '/');
-			$surl = $url;
-			$url = explode('/', $url);
-		}
-		//if $surl is "ololo/ajaja":
-		//First step. Look for "/pages/ololo/ajaja.php".
-		$path = $this->conf->tags['PAGE']['folder'] . DIRECTORY_SEPARATOR . $surl . '.php';
-		if (file_exists($path)) {
-			/* file found */
-			if ($this->conf->tags['PAGE']['realpath check'] AND !$this->checkPathIsInFolder($path, $this->conf->tags['PAGE']['folder'])) {
-				/* if file was found, but had to check realpath and check failed (file is not in dir where it have to be) */
-				return false;
-			}
-			$doc = $surl . '.php';
-		} else {
-			//Second step. If it is directory, look for "/pages/ololo/ajaja/index.php".
-			$path = $this->conf->tags['PAGE']['folder'] . DIRECTORY_SEPARATOR . $surl;
-			if (is_dir($path) AND file_exists($path . DIRECTORY_SEPARATOR . 'index.php')) {
-				if ($this->conf->tags['PAGE']['realpath check'] AND !$this->checkPathIsInFolder($path, $this->conf->tags['PAGE']['folder'])) {
-					return false;
-				}
-				$doc = $surl . DIRECTORY_SEPARATOR . 'index.php';
-			} else {
-				//Third step. If $this->conf->route_to_parent is set greater than zero, will look for nearest parent. Mean "/pages/ololo/ajaja/index.php" if not exist, goes to"/pages/ololo.php" or "/pages/ololo/index.php". (BUT NOT "/pages/index.php" anyway)
-				if ($this->conf->pinpie['route to parent'] > 0) {
-					unset($url[count($url) - 1]);
-					$doc = $this->findPageFile($url);
-				}
-			}
-		}
-		return $doc;
+	public function getUrlInfo($url) {
+		return new URL($url, $this);
 	}
 
 
@@ -147,27 +101,31 @@ class PP {
 	 *
 	 */
 	public function checkPathIsInFolder($path, $folder) {
-		$this->pinpie->times[] = [microtime(true), 'checking if ' . $path . ' belongs to ' . $folder];
+		$this->times[] = [microtime(true), 'checking if ' . $path . ' belongs to ' . $folder];
 		if (!$path OR !$folder) {
 			return false;
 		}
 		$path = str_replace('\\', '/', $path);
 		$folder = str_replace('\\', '/', $folder);
-		$this->pinpie->times[] = [microtime(true), 'realpath'];
+		$this->times[] = [microtime(true), 'realpath'];
 		$folderRealpath = realpath($folder);
 		$pathRealpath = realpath($path);
-		$this->pinpie->times[] = [microtime(true), 'realpath done'];
+		$this->times[] = [microtime(true), 'realpath done'];
 		if ($pathRealpath === false OR $folderRealpath === false) {
+			// Some of paths is empty
 			return false;
 		}
 		$folderRealpath = rtrim($folderRealpath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 		$pathRealpath = rtrim($pathRealpath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-		if (strlen($pathRealpath) < $folderRealpath) {
+		if (strlen($pathRealpath) < strlen($folderRealpath)) {
+			// File path is shorter that a folder path. This file can't be inside that folder.
 			return false;
 		}
 		if (substr($pathRealpath, 0, strlen($folderRealpath)) !== $folderRealpath) {
+			// Path to a folder of file is not equal to a path to a folder where it have to be located
 			return false;
 		}
+		// OK
 		return $path;
 	}
 
@@ -415,7 +373,7 @@ class PP {
 		if (is_array($this->conf->pinpie['cache rules'][$ruleID])) {
 			$rules = array_merge($defaults, $this->conf->pinpie['cache rules'][$ruleID]);
 		}
-		$url = array_merge(['path' => '', 'query' => ''], $this->url);
+		$url = ['path' => $this->url->path, 'query' => $this->url->query];
 		//Check, if we have to use 'path' part of url, so caching could be done separately for each page
 		if ($rules['ignore url']) {
 			$url['path'] = '';
