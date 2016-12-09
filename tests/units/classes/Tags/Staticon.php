@@ -3,7 +3,6 @@
 namespace pinpie\pinpie\Tags\tests\units;
 
 use atoum;
-use pinpie\pinpie\PP;
 
 class Staticon extends atoum {
 

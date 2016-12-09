@@ -5,7 +5,7 @@ namespace pinpie\pinpie;
 class PinPIE {
   /** @var null|PP */
   public static $pinpie = null;
-  /** @var null|CFG */
+  /** @var null|Config */
   public static $conf = null;
   public static $url = null,
     $document = null,

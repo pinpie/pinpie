@@ -3,17 +3,16 @@
 namespace pinpie\pinpie\tests\units;
 
 use atoum;
-use pinpie\pinpie\Tags\Constant;
 
-class CFG extends atoum {
+class Config extends atoum {
 
 
 	public function test_config() {
 		if (false) {
-			$this->testedInstance = new \pinpie\pinpie\CFG();
+			$this->testedInstance = new \pinpie\pinpie\Config();
 		}
 		$_SERVER['SERVER_NAME'] = 'site.com';
-		$cfg = new \pinpie\pinpie\CFG();
+		$cfg = new \pinpie\pinpie\Config();
 		$defaults = $cfg->getDefaults();;
 
 		$this
@@ -56,7 +55,11 @@ class CFG extends atoum {
 				'file' => false,
 				'pinpie' => [
 					'route to parent' => 11,
-					'log' => ['show' => 'abc']
+					'log' => [
+						'show' => 'abc',
+						'path' => 'def',
+					],
+					'templates realpath check' => false,
 				],
 				'tags' => [
 					'%' => [
@@ -71,8 +74,8 @@ class CFG extends atoum {
 		$this->integer($this->testedInstance->debug)->isIdenticalTo($settings['debug']);
 		$this->integer($this->testedInstance->pinpie['route to parent'])->isIdenticalTo($settings['pinpie']['route to parent']);
 		$this->string($this->testedInstance->pinpie['log']['show'])->isIdenticalTo($settings['pinpie']['log']['show']);
-		$this->string($this->testedInstance->pinpie['log']['path'])->isIdenticalTo($defaults['pinpie']['log']['path']);
-		$this->boolean($this->testedInstance->pinpie['templates realpath check'])->isIdenticalTo($defaults['pinpie']['templates realpath check']);
+		$this->string($this->testedInstance->pinpie['log']['path'])->isIdenticalTo($settings['pinpie']['log']['path']);
+		$this->boolean($this->testedInstance->pinpie['templates realpath check'])->isIdenticalTo($settings['pinpie']['templates realpath check']);
 		$this->integer($this->testedInstance->tags['%']['gzip level'])->isIdenticalTo(29);
 		$this->array($this->testedInstance->tags['%']['gzip types'])->isIdenticalTo(['css']);
 
@@ -98,7 +101,7 @@ class CFG extends atoum {
 		$this->boolean($this->testedInstance->debug)->isIdenticalTo(true);
 		$this->integer($this->testedInstance->pinpie['route to parent'])->isIdenticalTo($settings['pinpie']['route to parent']);
 		$this->string($this->testedInstance->pinpie['log']['show'])->isIdenticalTo($settings['pinpie']['log']['show']);
-		$this->string($this->testedInstance->pinpie['log']['path'])->isIdenticalTo($defaults['pinpie']['log']['path']);
+		$this->integer($this->testedInstance->pinpie['log']['path'])->isIdenticalTo(1500);
 		$this->boolean($this->testedInstance->pinpie['templates realpath check'])->isIdenticalTo($defaults['pinpie']['templates realpath check']);
 		$this->integer($this->testedInstance->tags['%']['gzip level'])->isIdenticalTo(25);
 		$this->array($this->testedInstance->tags['%']['gzip types'])->isIdenticalTo(['zzz']);

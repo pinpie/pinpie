@@ -5,7 +5,7 @@ namespace pinpie\pinpie;
 use mageekguy\atoum\asserters\variable;
 use mageekguy\atoum\php\tokenizer\iterator\value;
 
-class CFG {
+class Config {
 
 	// descriptions are in ReadConf()
 	public
@@ -96,7 +96,7 @@ class CFG {
 			],
 			'codepage' => 'utf-8',
 			'log' => [
-				'path' => 'pin.log',
+				'path' => false,
 				'show' => false,
 			],
 			'page not found' => 'index.php',

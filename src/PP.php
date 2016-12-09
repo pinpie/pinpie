@@ -6,7 +6,7 @@ use pinpie\pinpie\Tags\Tag;
 
 
 class PP {
-	/** @var CFG | null */
+	/** @var Config | null */
 	public $conf = null;
 	/** @var null| URL */
 	public $url = null;
@@ -42,7 +42,7 @@ class PP {
 		if (empty($_SERVER['REQUEST_URI'])) {
 			$_SERVER['REQUEST_URI'] = '';
 		}
-		$this->conf = new CFG($settings);
+		$this->conf = new Config($settings);
 		$this->url = $this->getDocument($settings);
 		$this->Init();
 		$this->times[] = [microtime(true), 'PinPIE started'];
@@ -84,7 +84,7 @@ class PP {
 
 
 	/**
-	 * Looks for corresponding file by provided url path. Returns URL instance or false on fail.
+	 * Looks for corresponding page file by provided url path. Returns URL instance or false on fail.
 	 * @param $url
 	 * @return bool|\pinpie\pinpie\URL
 	 */
@@ -101,10 +101,11 @@ class PP {
 	 *
 	 */
 	public function checkPathIsInFolder($path, $folder) {
-		$this->times[] = [microtime(true), 'checking if ' . $path . ' belongs to ' . $folder];
-		if (!$path OR !$folder) {
+		if ($path === '' OR $path === null OR $path === false OR $folder === '' OR $folder === null OR $folder === false) {
+			/* can't use empty() because it can be a string like "0", and it's valid path */
 			return false;
 		}
+		//$this->times[] = [microtime(true), 'checking if  "' . $path . '" belongs to "' . $folder . '"'];
 		$path = str_replace('\\', '/', $path);
 		$folder = str_replace('\\', '/', $folder);
 		$this->times[] = [microtime(true), 'realpath'];
@@ -344,13 +345,12 @@ class PP {
 	}
 
 	public function logit($str = '') {
-		if (empty($this->conf->pinpie['log'])) {
-			return false;
+		if (!empty($this->conf->pinpie['log']['show'])) {
+			echo htmlspecialchars($str) . "<br>\n";
 		}
-		if ($this->conf->pinpie['log']['show']) {
-			echo $str . "<br>\n";
+		if (!empty($this->conf->pinpie['log']['path'])) {
+			file_put_contents($this->conf->pinpie['log']['path'], date('Y.m.d H:i:s') . ' - ' . $str . "\n", FILE_APPEND);
 		}
-		return file_put_contents($this->conf->pinpie['log']['path'], date('Y.m.d H:i:s') . ' - ' . $str . "\n", FILE_APPEND);
 	}
 
 
