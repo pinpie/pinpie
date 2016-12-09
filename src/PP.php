@@ -105,7 +105,7 @@ class PP {
 			/* can't use empty() because it can be a string like "0", and it's valid path */
 			return false;
 		}
-		//$this->times[] = [microtime(true), 'checking if  "' . $path . '" belongs to "' . $folder . '"'];
+		$this->times[] = [microtime(true), 'checking if  "' . $path . '" belongs to "' . $folder . '"'];
 		$path = str_replace('\\', '/', $path);
 		$folder = str_replace('\\', '/', $folder);
 		$this->times[] = [microtime(true), 'realpath'];

@@ -15,6 +15,7 @@ class URL extends atoum {
 			'file' => false,
 			'pinpie' => [
 				'route to parent' => 10,
+				'cache class' => '\pinpie\pinpie\Cachers\Disabled',
 			]
 		];
 		$pp = new \pinpie\pinpie\PP($settings);
@@ -108,7 +109,7 @@ class URL extends atoum {
 			->and($url = '/folder/pageinfolder/non/existing/path')
 			->given($this->newTestedInstance($url, $pp))
 			->string($this->testedInstance->url)->isEqualTo($url)
-			->string($this->testedInstance->file)->isEqualTo('folder\pageinfolder.php')
+			->string($this->testedInstance->file)->isEqualTo('folder/pageinfolder.php')
 			->boolean($this->testedInstance->found)->isEqualTo(true)
 			->array($this->testedInstance->foundUrl)->isEqualTo(['folder', 'pageinfolder'])
 			->array($this->testedInstance->params)->isEqualTo(['non', 'existing', 'path'])
@@ -156,6 +157,9 @@ class URL extends atoum {
 		$settings = [
 			'root' => realpath(__DIR__ . '/../../filetests/pages'),
 			'file' => false,
+			'pinpie' => [
+				'cache class' => '\pinpie\pinpie\Cachers\Disabled',
+			]
 		];
 
 		$this
