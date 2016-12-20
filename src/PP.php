@@ -108,26 +108,27 @@ class PP {
 		$this->times[] = [microtime(true), 'checking if  "' . $path . '" belongs to "' . $folder . '"'];
 		$path = str_replace('\\', '/', $path);
 		$folder = str_replace('\\', '/', $folder);
-		$this->times[] = [microtime(true), 'realpath'];
+		$this->times[] = [microtime(true), 'realpath checking ' . $path . ' vs ' . $folder];
 		$folderRealpath = realpath($folder);
 		$pathRealpath = realpath($path);
-		$this->times[] = [microtime(true), 'realpath done'];
 		if ($pathRealpath === false OR $folderRealpath === false) {
 			// Some of paths is empty
+			$this->times[] = [microtime(true), 'one of paths is empty'];
 			return false;
 		}
-		$folderRealpath = rtrim($folderRealpath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-		$pathRealpath = rtrim($pathRealpath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-		if (strlen($pathRealpath) < strlen($folderRealpath)) {
+		if (strlen(rtrim($pathRealpath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR) < strlen(rtrim($folderRealpath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR)) {
 			// File path is shorter that a folder path. This file can't be inside that folder.
+			$this->times[] = [microtime(true), 'File path is shorter that a folder path. This file can\'t be inside that folder.'];
 			return false;
 		}
 		if (substr($pathRealpath, 0, strlen($folderRealpath)) !== $folderRealpath) {
 			// Path to a folder of file is not equal to a path to a folder where it have to be located
+			$this->times[] = [microtime(true), 'Path to a folder of file is not equal to a path to a folder where it have to be located'];
 			return false;
 		}
 		// OK
-		return $path;
+		$this->times[] = [microtime(true), 'Check successful'];
+		return $pathRealpath;
 	}
 
 	/**
@@ -248,14 +249,10 @@ class PP {
 
 
 	public function report() {
-
 		if (!$this->conf->debug) {
 			return false;
-		} else {
-			if (!empty($this->conf->pinpie['report password']) AND (!isset($_GET['PINPIEREPORT']) OR $_GET['PINPIEREPORT'] !== $this->conf->pinpie['report password'])) {
-				return false;
-			}
 		}
+		ob_start();
 		echo '<hr>';
 		echo '$times (ms):<br>';
 		echo 'Total: ' . number_format((microtime(true) - $this->startTime) * 1000, 2) . "ms<br>";
@@ -285,19 +282,15 @@ class PP {
 				. str_repeat('  ', $tag->depth) . trim($tag->fulltag, " \n\r\t") . "\n";
 		}
 		echo '</pre><br>';
-
-		return true;
+		return ob_get_clean();
 	}
 
 
 	public function reportTags() {
 		if (!$this->conf->debug) {
 			return false;
-		} else {
-			if (!empty($this->conf->pinpie['report password']) AND (!isset($_GET['PINPIEREPORT']) OR $_GET['PINPIEREPORT'] !== $this->conf->pinpie['report password'])) {
-				return false;
-			}
 		}
+		ob_start();
 		echo '<hr>';
 		$ignore = ['pinpie',];
 		foreach ($this->tags as $tag) {
@@ -341,7 +334,7 @@ class PP {
 			}
 			echo '</table>';
 		}
-		return true;
+		return ob_get_clean();
 	}
 
 	public function logit($str = '') {

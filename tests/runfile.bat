@@ -1,0 +1,1 @@
+php "%~dp0../vendor/atoum/atoum/bin/atoum" -c "%~dp0runfile.cfg.php" -debug -f "%~dp0%1"

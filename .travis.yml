@@ -12,4 +12,4 @@ before_script:
   #- echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - phpenv config-add tests/apc.ini
 
-script: vendor/bin/atoum -c tests/.atoum.php
+script: vendor/bin/atoum -c tests/runtests.cfg.php

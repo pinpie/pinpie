@@ -11,7 +11,6 @@ class Config {
 	public
 		$cache = null,
 		$oth = null,
-		$static_servers = null,
 		$databases = null,
 		/** @var \pinpie\pinpie\PP|null */
 		$root = null,
@@ -43,7 +42,6 @@ class Config {
 		$this->cache = $settings['cache'];
 		$this->oth = $settings['oth'];
 		$this->databases = $settings['databases'];
-		$this->static_servers = $settings['static_servers'];
 		$this->pinpie = $settings['pinpie'];
 		$this->debug = $settings['debug'];
 		$this->tags = $settings['tags'];
@@ -82,7 +80,6 @@ class Config {
 		$cache = []; // settings for current cacher
 		$oth = []; //you can put some custom setting here
 		$databases = []; //to store database settings
-		$static_servers = []; //list here static content servers addresses if you want to use them
 		$debug = false; //enables PinPIE::report() output. Use it to enable your own debug mode. Globally available through CFG::$debug.
 
 		//Loading defaults
@@ -100,14 +97,14 @@ class Config {
 				'show' => false,
 			],
 			'page not found' => 'index.php',
+			'postinclude' => $this->root . DIRECTORY_SEPARATOR . 'postinclude.php',
+			'preinclude' => $this->root . DIRECTORY_SEPARATOR . 'preinclude.php',
 			'route to parent' => 1, //read doc. if exact file not found, instead of 404, PinPIE will try to route request to nearest existing parent entry in url. Default is 1, it means PinPIE will handle "site.com/url" and "site.com/url/" as same page.
 			'site url' => $_SERVER['SERVER_NAME'],
 			'templates clear vars after use' => false,
 			'templates folder' => $this->root . DIRECTORY_SEPARATOR . 'templates',
 			'templates function' => false,
 			'templates realpath check' => true,
-			'preinclude' => $this->root . DIRECTORY_SEPARATOR . 'preinclude.php',
-			'postinclude' => $this->root . DIRECTORY_SEPARATOR . 'postinclude.php',
 		];
 
 		$tags = [
@@ -137,6 +134,7 @@ class Config {
 				'dimensions types' => ['img'],
 				'dimensions function' => false,
 				'draw function' => false,
+				'servers' => [], //list here static content servers addresses if you want to use them
 			],
 			'=' => ['class' => '\pinpie\pinpie\Tags\Constant'],
 			'@' => ['class' => '\pinpie\pinpie\Tags\Command'],
@@ -145,7 +143,6 @@ class Config {
 		$arr['cache'] = $cache;
 		$arr['oth'] = $oth; //you can use that array to store settings for your own scripts
 		$arr['databases'] = $databases;
-		$arr['static_servers'] = $static_servers;
 		$arr['pinpie'] = $pinpie;
 		$arr['debug'] = $debug;
 		$arr['tags'] = $tags;
@@ -160,7 +157,6 @@ class Config {
 		$cache = $arr['cache'];
 		$oth = $arr['oth'];
 		$databases = $arr['databases'];
-		$static_servers = $arr['static_servers'];
 		$pinpie = $arr['pinpie'];
 		$debug = $arr['debug'];
 		$tags = $arr['tags'];
@@ -174,7 +170,6 @@ class Config {
 		$arr['cache'] = $cache;
 		$arr['oth'] = $oth;
 		$arr['databases'] = $databases;
-		$arr['static_servers'] = $static_servers;
 		$arr['pinpie'] = $pinpie;
 		$arr['debug'] = $debug;
 		$arr['tags'] = $tags;

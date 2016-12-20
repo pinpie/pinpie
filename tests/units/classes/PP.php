@@ -258,4 +258,72 @@ class PP extends atoum {
 		$this->string($this->testedInstance->render())->isEqualTo('anotherpreinc' . 'page' . 'anotherpostinc');
 
 	}
+
+	function test_report() {
+		if (false) {
+			$this->testedInstance = new \pinpie\pinpie\PP();
+		}
+
+		$defaults = [
+			'root' => '',
+			'file' => false,
+			'pinpie' => [
+				'cache class' => '\pinpie\pinpie\Cachers\Disabled',
+			],
+		];
+
+		$this
+			->assert('report: debug disabled')
+			->if($settings = $defaults);
+		$this->newTestedInstance($settings);
+		$this->testedInstance->template = false;
+		$this->boolean($this->testedInstance->report())->isFalse();
+
+		$this
+			->assert('report: debug enabled')
+			->if($settings = $defaults)
+			->and($settings['debug'] = true);
+		$this->newTestedInstance($settings);
+		$this->testedInstance->template = false;
+		$this->string($this->testedInstance->report())->contains('NO ERRORS');
+
+		$this
+			->assert('report: with errors')
+			->if($settings = $defaults)
+			->and($settings['debug'] = true);
+		$this->newTestedInstance($settings);
+		$this->testedInstance->template = false;
+		$this->testedInstance->errors[] = 'abcdefgh';
+		$this->string($this->testedInstance->report())->contains('Errors:');
+	}
+
+	function test_reportTags() {
+		if (false) {
+			$this->testedInstance = new \pinpie\pinpie\PP();
+		}
+
+		$defaults = [
+			'root' => '',
+			'file' => false,
+			'pinpie' => [
+				'cache class' => '\pinpie\pinpie\Cachers\Disabled',
+			],
+		];
+
+		$this
+			->assert('reportTags: debug disabled')
+			->if($settings = $defaults);
+		$this->newTestedInstance($settings);
+		$this->testedInstance->template = false;
+		$this->boolean($this->testedInstance->reportTags())->isFalse();
+
+		$this
+			->assert('reportTags: debug enabled')
+			->if($settings = $defaults)
+			->and($settings['debug'] = true);
+		$this->newTestedInstance($settings);
+		$this->testedInstance->template = false;
+		$this->string($this->testedInstance->reportTags())->contains('<tr><td>fulltag</td><td>PAGE index.php</td></tr>');
+
+	}
 }

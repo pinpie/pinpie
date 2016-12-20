@@ -6,7 +6,7 @@ use \pinpie\pinpie\PP as PP;
 
 
 class Staticon extends Tag {
-	private
+	public
 		$dimensions = [],
 		$gzip = false,
 		$gzipLevel = 1,
@@ -18,6 +18,10 @@ class Staticon extends Tag {
 		$staticType = false,
 		$url = false;
 
+	/**
+	 * Internal cache for any computed values like url
+	 * @var array
+	 */
 	private $c = [];
 
 	public function __construct(PP $pinpie, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, Tag $parentTag = null, $priority = 10000, $depth = 0) {
@@ -117,16 +121,25 @@ class Staticon extends Tag {
 
 	private function getStaticPathReal() {
 		$path = rtrim($this->settings['folder'], '/\\') . DIRECTORY_SEPARATOR . ltrim($this->staticPath, '/\\');
+		$this->pinpie->times[] = [microtime(true), 'processing static path ' . $path];
 		if ($this->settings['realpath check']) {
 			$this->pinpie->times[] = [microtime(true), 'realpath check required'];
 			$path = $this->pinpie->checkPathIsInFolder($path, $this->settings['folder']);
-			$this->pinpie->times[] = [microtime(true), 'realpath check done'];
+			if ($path === false) {
+				$this->pinpie->times[] = [microtime(true), 'realpath check failed'];
+			} else {
+				$this->pinpie->times[] = [microtime(true), 'realpath check successful, realpath is ' . $path];
+			}
 		} else {
 			$this->pinpie->times[] = [microtime(true), 'realpath check skipped'];
 		}
-		if (empty($path) OR !file_exists($path)) {
-			$this->pinpie->times[] = [microtime(true), 'file not found'];
+		if ($path === false OR $path === null OR $path === '') {
+			$this->pinpie->times[] = [microtime(true), 'path is empty'];
+			return false;
+		}
+		if (!file_exists($path)) {
 			// no such file
+			$this->pinpie->times[] = [microtime(true), 'file not found at path ' . $path];
 			return false;
 		}
 		$this->pinpie->times[] = [microtime(true), 'getStaticPathReal done'];
@@ -143,11 +156,11 @@ class Staticon extends Tag {
 		if (isset($this->c['getServer'][$this->filename])) {
 			return $this->c['getServer'][$this->filename];
 		}
-		if (empty($this->pinpie->conf->static_servers)) {
+		if (empty($this->pinpie->conf->tags['%']['servers'])) {
 			$this->url = '//' . $this->pinpie->conf->pinpie['site url'];
 		} else {
-			$a = abs(crc32($this->filename)) % count($this->pinpie->conf->static_servers);
-			$this->url = '//' . $this->pinpie->conf->static_servers[$a];
+			$a = abs(crc32($this->filename)) % count($this->pinpie->conf->tags['%']['servers']);
+			$this->url = '//' . $this->pinpie->conf->tags['%']['servers'][$a];
 		}
 		$this->c['getServer'][$this->filename] = $this->url;
 		return $this->url;
@@ -191,28 +204,28 @@ class Staticon extends Tag {
 			return false;
 		}
 
-		/*
-	 * We can't lock file for writing, external minifiers like Yahoo YUI Compressor or Google Closure Compiler will have no access in that case.
-	 * Locking file for reading will prevent file from any modifications.
-	 * So if we will attempt to lock it for writing, we will success if file is not locked for reading in *another* process.
-	 */
-		if (flock($fp, LOCK_SH) === false) {
-			return false;
-		}
-		if (flock($fp, LOCK_EX | LOCK_NB) === false) {
-			return false;
-		}
-		// Switching back to reading lock to make file readable by any external processes
-		if (flock($fp, LOCK_SH) === false) {
+		/* *
+	   * We can't lock file for writing, external minifiers like Yahoo YUI Compressor
+		 * or Google Closure Compiler will have no access to file in that case.
+	   * Locking file for reading will prevent file from any modifications.
+	   * We have only to attempt to lock it for writing, and switch back.
+		 * If the file is already locked for reading - writing lock will fail.
+		 * Success means the file is not locked for reading in another process.
+		 * */
+		if (
+			flock($fp, LOCK_EX) === false
+			// Switching back to reading lock to make file readable by any external processes
+			OR flock($fp, LOCK_SH) === false
+		) {
 			return false;
 		}
 		// Calling user function, where minification is made
 		$func = $this->settings['minify function'];
-		$ufuncr = $func($this);
+		$this->minifiedPath = $func($this);
 		// Releasing lock
 		flock($fp, LOCK_UN);
 		fclose($fp);
-		if (!$ufuncr) {
+		if (!$this->minifiedPath) {
 			$this->pinpie->times[] = [microtime(true), '#minify func cancels use of min path by returning false ' . $this->filename];
 			return false;
 		}
@@ -225,7 +238,9 @@ class Staticon extends Tag {
 	 * @return bool
 	 */
 	private function checkMTime($older, $newer) {
-		if ($this->pinpie->filemtime($older) !== false AND $this->pinpie->filemtime($newer) !== false AND $this->pinpie->filemtime($older) <= $this->pinpie->filemtime($newer)) {
+		$molder = $this->pinpie->filemtime($older);
+		$mnewer = $this->pinpie->filemtime($newer);
+		if ($molder !== false AND $mnewer !== false AND $molder <= $mnewer) {
 			return true;
 		}
 		return false;
@@ -243,21 +258,22 @@ class Staticon extends Tag {
 		if (isset($this->c['getMinified'][$this->staticPath])) {
 			$this->minifiedURL = $this->c['getMinified'][$this->staticPath]['url'];
 			$this->minifiedPath = $this->c['getMinified'][$this->staticPath]['path'];
-		}
-		$pi = pathinfo('/' . trim($this->staticPath, '/\\'));
-		$this->minifiedURL = trim($pi['dirname'], '/\\') . DIRECTORY_SEPARATOR . 'min.' . $pi['basename'];
-		$this->minifiedPath = $this->settings['folder'] . DIRECTORY_SEPARATOR . trim($this->minifiedURL, '/\\');
-		if ($this->checkMTime($this->filename, $this->minifiedPath)) {
-			$useminify = true;
 		} else {
-			$useminify = $this->checkAndRunMinifier();
-			$this->pinpie->times[] = [microtime(true), 'checkAndRunMinifier done'];
+			$pi = pathinfo('/' . trim($this->staticPath, '/\\'));
+			$this->minifiedURL = trim($pi['dirname'], '/\\') . '/min.' . $pi['basename'];
+			$this->minifiedPath = $this->settings['folder'] . DIRECTORY_SEPARATOR . trim($this->minifiedURL, '/\\');
+			if ($this->checkMTime($this->filename, $this->minifiedPath)) {
+				$useminify = true;
+			} else {
+				$useminify = $this->checkAndRunMinifier();
+				$this->pinpie->times[] = [microtime(true), 'checkAndRunMinifier done'];
+			}
+			if (!$useminify) {
+				$this->minifiedURL = false;
+			}
+			$this->c['getMinified'][$this->staticPath]['url'] = $this->minifiedURL;
+			$this->c['getMinified'][$this->staticPath]['path'] = $this->minifiedPath;
 		}
-		if (!$useminify) {
-			$this->minifiedURL = false;
-		}
-		$this->c['getMinified'][$this->staticPath]['url'] = $this->minifiedURL;
-		$this->c['getMinified'][$this->staticPath]['path'] = $this->minifiedPath;
 		$this->pinpie->times[] = [microtime(true), 'getMinified done'];
 	}
 
