@@ -149,14 +149,13 @@ class Snippet extends atoum {
 			->and($pp = new PP($settings))
 			->and($this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname))
 			->and($out2 = $this->testedInstance->getOutput())
+			->string($out1)->isEqualTo($out2)
 			->then
 			->given(sleep(2))
 			->and($pp = new PP($settings))
 			->and($this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname))
 			->and($out3 = $this->testedInstance->getOutput())
-			->string($out1)
-			->isEqualTo($out2)
-			->isNotEqualTo($out3)
+			->string($out1)->isNotEqualTo($out3)
 			->then;
 	}
 }
