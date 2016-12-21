@@ -60,6 +60,7 @@ class Staticon extends Tag {
 		$this->pinpie->times[] = [microtime(true), '$this->filename = $this->getStaticPath(); done'];
 
 		if (empty($this->filename)) {
+			$this->error('file not found');
 			$this->filename = $this->value;
 		} else {
 			if ($this->minifie) {
