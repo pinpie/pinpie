@@ -25,16 +25,12 @@ class Staticon extends Tag {
 	private $c = [];
 
 	public function __construct(PP $pinpie, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, Tag $parentTag = null, $priority = 10000, $depth = 0) {
-				//var_dump('__construct 1 $this->c[getStaticPath]', $this->c['getStaticPath']);
-
 		parent::__construct($pinpie, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parentTag, $priority, $depth);
 		$this->pinpie->times[] = [microtime(true), 'static ' . $fulltag . ' construct started'];
 		if (!isset($this->pinpie->inCa['static'])) {
 			$this->pinpie->inCa['static'] = [];
 		}
 		$this->c = &$this->pinpie->inCa['static'];
-
-				//var_dump('__construct 2 $this->c[getStaticPath]', $this->c['getStaticPath']);
 
 		$this->staticType = $this->name;
 		$this->staticPath = $this->value . (!empty($this->params) ? '?' . implode('&', $this->params) : '');
@@ -46,8 +42,6 @@ class Staticon extends Tag {
 				$this->staticPath = rtrim($this->pinpie->url->path, '/') . '/' . $this->staticPath;
 			}
 		}
-				//var_dump('__construct 3 $this->c[getStaticPath]', $this->c['getStaticPath']);
-
 		if (empty($this->settings['minify types'])) {
 			$this->settings['minify types'] = [];
 		}
@@ -60,11 +54,7 @@ class Staticon extends Tag {
 		$this->minifie = in_array($this->staticType, $this->settings['minify types']);
 		$this->gzip = in_array($this->staticType, $this->settings['gzip types']);
 		$this->pinpie->times[] = [microtime(true), '$this->filename = $this->getStaticPath();'];
-						//var_dump('__construct 4 $this->c[getStaticPath]', $this->c['getStaticPath']);
-
 		$this->filename = $this->getStaticPath();
-						var_dump('__construct 5 $this->c[getStaticPath]', $this->c['getStaticPath']);// тут уже есть
-
 		$this->pinpie->times[] = [microtime(true), '$this->filename = $this->getStaticPath(); done, path is ' . $this->filename];
 
 		if (empty($this->filename)) {
@@ -102,24 +92,17 @@ class Staticon extends Tag {
 	}
 
 	public function getStaticUrl() {
-		var_dump('[FLOW] getStaticUrl() start $this->filename = ' . $this->filename);
-		var_dump('$this->c[getStaticUrl]', $this->c['getStaticUrl']);
 		if (!isset($this->c['getStaticUrl'])) {
 			$this->c['getStaticUrl'] = [];
 		}
 		if (!isset($this->c['getStaticUrl'][$this->filename])) {
-			var_dump('[FLOW] getStaticUrl() no cached filename');
 			if ($this->minifie AND $this->minifiedURL) {
-				var_dump('[FLOW] getStaticUrl() minified');
 				$file = $this->minifiedURL;
 			} else {
-				var_dump('[FLOW] getStaticUrl() not minified');
-
 				$file = $this->staticPath;
 			}
 			$this->c['getStaticUrl'][$this->filename] = $this->getServer() . ($file[0] == '/' ? '' : '/') . $file;
 		}
-		var_dump('[FLOW] getStaticUrl() end $this->filename = ' . $this->filename);
 		return $this->c['getStaticUrl'][$this->filename];
 	}
 
@@ -163,10 +146,7 @@ class Staticon extends Tag {
 	}
 
 	public function getServer() {
-		var_dump('[FLOW] getServer() started');
-
 		if ($this->filename === false OR $this->filename === null OR $this->filename === '') {
-			var_dump('[FLOW] getServer() empty filename');
 			return false;
 		}
 		if (!isset($this->c['getServer'])) {
@@ -182,7 +162,6 @@ class Staticon extends Tag {
 			$this->url = '//' . $this->pinpie->conf->tags['%']['servers'][$a];
 		}
 		$this->c['getServer'][$this->filename] = $this->url;
-		var_dump('[FLOW] getServer() end $this->url = ' . $this->url);
 
 		return $this->url;
 	}

@@ -1,6 +1,10 @@
 language: php
 php:
+  - '5.4'
+  - '5.5'
   - '5.6'
+  - '7.0'
+  - '7.1'
 
 before_script:
   - if [[ "$(php -v | grep 'PHP 5')" ]]; then echo yes | pecl install apcu-4.0.8; composer require atoum/atoum; fi
@@ -8,5 +12,5 @@ before_script:
   #- echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - phpenv config-add tests/apc.ini
 
-#script: vendor/bin/atoum -c tests/runtests.cfg.php
-script: vendor/bin/atoum -f tests/units/classes/Tags/Staticon.php
+script: vendor/bin/atoum -c tests/runtests.cfg.php
+#script: vendor/bin/atoum -f tests/units/classes/Tags/Staticon.php
