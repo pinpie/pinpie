@@ -57,7 +57,7 @@ class Staticon extends Tag {
 		$this->gzip = in_array($this->staticType, $this->settings['gzip types']);
 		$this->pinpie->times[] = [microtime(true), '$this->filename = $this->getStaticPath();'];
 		$this->filename = $this->getStaticPath();
-		$this->pinpie->times[] = [microtime(true), '$this->filename = $this->getStaticPath(); done'];
+		$this->pinpie->times[] = [microtime(true), '$this->filename = $this->getStaticPath(); done, path is ' . $this->filename];
 
 		if (empty($this->filename)) {
 			$this->error('file not found');
@@ -148,7 +148,8 @@ class Staticon extends Tag {
 	}
 
 	public function getServer() {
-		if (!$this->filename) {
+		if ($this->filename === false OR $this->filename === null OR $this->filename === '') {
+			var_dump('empty filename');
 			return false;
 		}
 		if (!isset($this->c['getServer'])) {
