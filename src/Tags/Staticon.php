@@ -95,6 +95,7 @@ class Staticon extends Tag {
 
 	public function getStaticUrl() {
 		var_dump('[FLOW] getStaticUrl() start $this->filename = ' . $this->filename);
+		var_dump($this->c['getStaticPath']);
 		if (!isset($this->c['getStaticPath'])) {
 			$this->c['getStaticPath'] = [];
 		}
