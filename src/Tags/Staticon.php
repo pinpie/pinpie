@@ -94,17 +94,23 @@ class Staticon extends Tag {
 	}
 
 	public function getStaticUrl() {
+		var_dump('[FLOW] getStaticUrl() start $this->filename = ' . $this->filename);
 		if (!isset($this->c['getStaticPath'])) {
 			$this->c['getStaticPath'] = [];
 		}
 		if (!isset($this->c['getStaticPath'][$this->filename])) {
+			var_dump('[FLOW] getStaticUrl() no cached filename');
 			if ($this->minifie AND $this->minifiedURL) {
+				var_dump('[FLOW] getStaticUrl() minified');
 				$file = $this->minifiedURL;
 			} else {
+				var_dump('[FLOW] getStaticUrl() not minified');
+
 				$file = $this->staticPath;
 			}
 			$this->c['getStaticPath'][$this->filename] = $this->getServer() . ($file[0] == '/' ? '' : '/') . $file;
 		}
+		var_dump('[FLOW] getStaticUrl() end $this->filename = ' . $this->filename);
 		return $this->c['getStaticPath'][$this->filename];
 	}
 
@@ -148,8 +154,10 @@ class Staticon extends Tag {
 	}
 
 	public function getServer() {
+		var_dump('[FLOW] getServer() started');
+
 		if ($this->filename === false OR $this->filename === null OR $this->filename === '') {
-			var_dump('empty filename');
+			var_dump('[FLOW] getServer() empty filename');
 			return false;
 		}
 		if (!isset($this->c['getServer'])) {
@@ -165,6 +173,8 @@ class Staticon extends Tag {
 			$this->url = '//' . $this->pinpie->conf->tags['%']['servers'][$a];
 		}
 		$this->c['getServer'][$this->filename] = $this->url;
+		var_dump('[FLOW] getServer() end $this->url = ' . $this->url);
+
 		return $this->url;
 	}
 
