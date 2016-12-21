@@ -235,6 +235,7 @@ class Staticon extends atoum {
 		};
 		$this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname);
 		$this->string($this->testedInstance->url)->isEqualTo('//site.com/min.js.js');
+		$this->array($pp->errors)->isEmpty();
 
 
 		$this
