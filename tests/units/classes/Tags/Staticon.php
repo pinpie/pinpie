@@ -7,7 +7,7 @@ use mageekguy\atoum\test\data\set;
 
 class Staticon extends atoum {
 
-	public function test() {
+	public function Atest() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\Tags\Staticon(null, [], 'fulltag', 'type', 'placeholder', 'template', 'cachetime', 'fullname');
 		}
@@ -124,7 +124,7 @@ class Staticon extends atoum {
 			->isEqualTo('start ' . $filename . ' //site.com/2xtPK.png ' . $filetime . '  1000 1000 <img src="//site.com/2xtPK.png?time=' . $shash . '" width="1000" height="1000"> end');
 	}
 
-	public function test_servers() {
+	public function Atest_servers() {
 
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\Tags\Staticon(null, [], 'fulltag', 'type', 'placeholder', 'template', 'cachetime', 'fullname');
