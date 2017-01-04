@@ -84,7 +84,7 @@ class PP {
 
 
 	/**
-	 * Looks for corresponding page file by provided url path. Returns URL instance or false on fail.
+	 * Looks for corresponding page file by provided url path. Returns URL class instance or false on fail.
 	 * @param $url
 	 * @return bool|\pinpie\pinpie\URL
 	 */

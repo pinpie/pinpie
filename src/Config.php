@@ -77,10 +77,10 @@ class Config {
 	}
 
 	public function getDefaults() {
-		$cache = []; // settings for current cacher
-		$oth = []; //you can put some custom setting here
-		$databases = []; //to store database settings
-		$debug = false; //enables PinPIE::report() output. Use it to enable your own debug mode. Globally available through CFG::$debug.
+		$cache = []; // Settings for current cacher
+		$oth = []; // You can put some custom setting here
+		$databases = []; // To store database settings
+		$debug = false; // Enables PinPIE::report() output. You can use it to enable your own debug mode. Globally available through PinPIE::$conf->debug.
 
 		//Loading defaults
 		$pinpie = [

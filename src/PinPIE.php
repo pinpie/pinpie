@@ -68,7 +68,7 @@ class PinPIE {
     return static::$pinpie->checkPathIsInFolder($path, $folder);
   }
 
-  public function findPageFile($url) {
+  public function getUrlInfo($url) {
     return static::$pinpie->getUrlInfo($url);
   }
 
