@@ -235,7 +235,7 @@ class URL extends atoum {
 			->string($this->testedInstance->url)->isEqualTo($url)
 			->boolean($this->testedInstance->found)->isEqualTo(true)
 			->string($this->testedInstance->file)->isEqualTo('folder'.DIRECTORY_SEPARATOR.'altindex.php')
-			->array($this->testedInstance->foundUrl)->isEqualTo([])
+			->array($this->testedInstance->foundUrl)->isEqualTo(['folder'])
 			->array($this->testedInstance->params)->isEqualTo([])
 			->string($this->testedInstance->path)->isEqualTo($url)
 			->then;
