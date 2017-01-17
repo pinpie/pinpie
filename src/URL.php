@@ -92,7 +92,11 @@ class URL {
 		} else {
 			$url = trim((string)$url, '/');
 			$surl = $url;
-			$url = explode('/', $url);
+			if ($url === "") {
+				$url = [];
+			} else {
+				$url = explode('/', $url);
+			}
 		}
 
 		//if $surl is "ololo/ajaja":
@@ -105,7 +109,7 @@ class URL {
 		}
 
 		//Second step. If it is directory, look for "/pages/ololo/ajaja/index.php".
-		$filename = $surl . DIRECTORY_SEPARATOR . 'index.php';
+		$filename = $surl . DIRECTORY_SEPARATOR . $this->pinpie->conf->pinpie['index file name'];
 		if ($this->checkFile($filename)) {
 			$this->file = trim($filename, '\\/');
 			$this->foundUrl = $url;

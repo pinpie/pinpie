@@ -92,6 +92,7 @@ class Config {
 				404 => ['ignore url' => true, 'ignore query params' => []]
 			],
 			'codepage' => 'utf-8',
+			'index file name' => 'index.php',
 			'log' => [
 				'path' => false,
 				'show' => false,

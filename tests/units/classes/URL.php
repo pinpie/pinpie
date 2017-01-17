@@ -51,7 +51,7 @@ class URL extends atoum {
 			->string($this->testedInstance->url)->isEqualTo($url)
 			->string($this->testedInstance->file)->isEqualTo('index.php')
 			->boolean($this->testedInstance->found)->isEqualTo(true)
-			->array($this->testedInstance->foundUrl)->isEqualTo([''])
+			->array($this->testedInstance->foundUrl)->isEqualTo([])
 			->array($this->testedInstance->params)->isEqualTo([])
 			->string($this->testedInstance->path)->isEqualTo($url)
 			->then;
@@ -109,7 +109,7 @@ class URL extends atoum {
 			->and($url = '/folder/pageinfolder/non/existing/path')
 			->given($this->newTestedInstance($url, $pp))
 			->string($this->testedInstance->url)->isEqualTo($url)
-			->string($this->testedInstance->file)->isEqualTo('folder'.DIRECTORY_SEPARATOR.'pageinfolder.php')
+			->string($this->testedInstance->file)->isEqualTo('folder' . DIRECTORY_SEPARATOR . 'pageinfolder.php')
 			->boolean($this->testedInstance->found)->isEqualTo(true)
 			->array($this->testedInstance->foundUrl)->isEqualTo(['folder', 'pageinfolder'])
 			->array($this->testedInstance->params)->isEqualTo(['non', 'existing', 'path'])
@@ -187,6 +187,56 @@ class URL extends atoum {
 			->boolean($this->testedInstance->found)->isEqualTo(false)
 			->array($this->testedInstance->foundUrl)->isEqualTo([])
 			->array($this->testedInstance->params)->isEqualTo(['folder', 'pageinfolder', 'non', 'existing', 'path'])
+			->string($this->testedInstance->path)->isEqualTo($url)
+			->then;
+	}
+
+	public function test_altindex() {
+		if (false) {
+			$this->testedInstance = new \pinpie\pinpie\URL(null, null);
+		}
+
+
+		$settings = [
+			'root' => realpath(__DIR__ . '/../../filetests/pages'),
+			'file' => false,
+			'pinpie' => [
+				'route to parent' => 10,
+				'cache class' => '\pinpie\pinpie\Cachers\Disabled',
+				'index file name' => 'altindex.php',
+			],
+			'tags' => [
+				'PAGE' => [
+					'folder' => realpath(__DIR__ . '/../../filetests/pages/altindex'),
+				]
+			]
+		];
+
+
+		$this
+			->assert('path: /')
+			->if($url = '/')
+			->and($pp = new \pinpie\pinpie\PP($settings))
+			->given($this->newTestedInstance($url, $pp))
+			->string($this->testedInstance->url)->isEqualTo($url)
+			->boolean($this->testedInstance->found)->isEqualTo(true)
+			->string($this->testedInstance->file)->isEqualTo('altindex.php')
+			->array($this->testedInstance->foundUrl)->isEqualTo([])
+			->array($this->testedInstance->params)->isEqualTo([])
+			->string($this->testedInstance->path)->isEqualTo($url)
+			->then;
+
+
+		$this
+			->assert('path /folder')
+			->if($url = '/folder')
+			->and($pp = new \pinpie\pinpie\PP($settings))
+			->given($this->newTestedInstance($url, $pp))
+			->string($this->testedInstance->url)->isEqualTo($url)
+			->boolean($this->testedInstance->found)->isEqualTo(true)
+			->string($this->testedInstance->file)->isEqualTo('folder'.DIRECTORY_SEPARATOR.'altindex.php')
+			->array($this->testedInstance->foundUrl)->isEqualTo([])
+			->array($this->testedInstance->params)->isEqualTo([])
 			->string($this->testedInstance->path)->isEqualTo($url)
 			->then;
 	}
