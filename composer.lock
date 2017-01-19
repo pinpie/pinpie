@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "34600b546179144a3f66c6784c289975",
-    "content-hash": "4b4b81c971d810d47b5ecce7a0864215",
+    "hash": "835075775dc9a3854bcfa0f6b58395af",
+    "content-hash": "6f6087674e163dd2ec312643cf776762",
     "packages": [],
     "packages-dev": [
         {
@@ -90,16 +90,16 @@
         },
         {
             "name": "atoum/reports-extension",
-            "version": "2.3.2",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/atoum/reports-extension.git",
-                "reference": "2bdd112bf70543b6c2b45b56f64cf0b10126b906"
+                "reference": "dab6ce52a3d389d93bb8301c8dcd4d2988e50222"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/atoum/reports-extension/zipball/2bdd112bf70543b6c2b45b56f64cf0b10126b906",
-                "reference": "2bdd112bf70543b6c2b45b56f64cf0b10126b906",
+                "url": "https://api.github.com/repos/atoum/reports-extension/zipball/dab6ce52a3d389d93bb8301c8dcd4d2988e50222",
+                "reference": "dab6ce52a3d389d93bb8301c8dcd4d2988e50222",
                 "shasum": ""
             },
             "require": {
@@ -143,7 +143,7 @@
                 "test",
                 "unit testing"
             ],
-            "time": "2016-06-22 15:39:30"
+            "time": "2016-05-24 12:23:54"
         },
         {
             "name": "atoum/stubs",
