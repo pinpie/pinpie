@@ -3,3 +3,5 @@
 nbproject
 vendor
 coverate.xml
+composer.lock
+
