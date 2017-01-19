@@ -14,3 +14,7 @@ before_script:
 
 script: vendor/bin/atoum -c tests/runtests.cfg.php
 #script: vendor/bin/atoum -f tests/units/classes/Tags/Staticon.php
+
+
+after_success:
+    - bash <(curl -s https://codecov.io/bash)

@@ -17,7 +17,8 @@
   },
   "require-dev": {
     "atoum/atoum": "2.8.2",
-    "atoum/stubs": "2.5.0"
+    "atoum/stubs": "2.5.0",
+    "atoum/reports-extension": "^2.3"
   },
   "autoload": {
     "psr-4": {
