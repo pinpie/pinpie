@@ -40,19 +40,19 @@ Caching can be enabled or disabled for each snippet tag separately.
 Caching control is predictable and simple.
 
 This is a snippet tag. Snippet is a piece of PHP code. This snippet is executed for every request. It is not cached.
-
+```
     [[$snippet]]
-
+```
 And here is the example of cached snippet syntax:
-
+```
     [[60$snippet]]
-    
+``` 
 Look at this one. It is cached for one minute. If snippet file or one of files of its children is changed, PinPIE will execute and recache this snippet automatically.
 
 To cache snippet forever, just use that syntax:
-
+```
     [[!$snippet]]
-    
+```
 That snippet will be cached for PHP_INT_MAX seconds, which is a lot.
 
 You don't need to purge cache yourself every time you change something important on the site. PinPIE will automatically recache only changed content. But anyway, you can purge the cache if you want.
