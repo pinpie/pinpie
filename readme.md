@@ -42,21 +42,21 @@ Caching control is predictable and simple.
 This is a snippet tag. Snippet is a piece of PHP code. This snippet is executed for every request. It is not cached.
 
 ```
-    [[$snippet]]
+[[$snippet]]
 ```
 
 And here is the example of cached snippet syntax:
 
 ```
-    [[60$snippet]]
-``` 
+[[60$snippet]]
+```
 
 Look at this one. It is cached for one minute. If snippet file or one of files of its children is changed, PinPIE will execute and recache this snippet automatically.
 
 To cache snippet forever, just use that syntax:
 
 ```
-    [[!$snippet]]
+[[!$snippet]]
 ```
 
 That snippet will be cached for PHP_INT_MAX seconds, which is a lot.
