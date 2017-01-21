@@ -1,9 +1,9 @@
-[![PinPIE](https://img.shields.io/badge/PHP-PinPIE-brightgreen.svg?style=flat-square)](http://pinpie.ru/)
-[![Build Status](http://img.shields.io/travis/pinpie/pinpie.svg?style=flat-square)](https://travis-ci.org/pinpie/pinpie)
-[![Latest Stable Version](https://img.shields.io/packagist/v/pinpie/pinpie.svg?style=flat-square)](https://packagist.org/packages/pinpie/pinpie)
-[![Total Downloads](https://img.shields.io/packagist/dt/pinpie/pinpie.svg?style=flat-square)](https://packagist.org/packages/pinpie/pinpie)
-[![License](https://img.shields.io/packagist/l/pinpie/pinpie.svg?style=flat-square)](https://packagist.org/packages/pinpie/pinpie)
-[![codecov](https://codecov.io/gh/pinpie/pinpie/branch/stable/graph/badge.svg?style=flat-square)](https://codecov.io/gh/pinpie/pinpie)
+[![PinPIE](https://img.shields.io/badge/PHP-PinPIE-brightgreen.svg)](http://pinpie.ru/)
+[![Build Status](http://img.shields.io/travis/pinpie/pinpie.svg)](https://travis-ci.org/pinpie/pinpie)
+[![Latest Stable Version](https://img.shields.io/packagist/v/pinpie/pinpie.svg)](https://packagist.org/packages/pinpie/pinpie)
+[![Total Downloads](https://img.shields.io/packagist/dt/pinpie/pinpie.svg)](https://packagist.org/packages/pinpie/pinpie)
+[![License](https://img.shields.io/packagist/l/pinpie/pinpie.svg)](https://packagist.org/packages/pinpie/pinpie)
+[![codecov](https://codecov.io/gh/pinpie/pinpie/branch/stable/graph/badge.svg)](https://codecov.io/gh/pinpie/pinpie)
 
 #PinPIE - when PHP Is Enough
 
