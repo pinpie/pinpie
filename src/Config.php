@@ -51,6 +51,7 @@ class Config {
 	 * Merges settings arrays. Minor is overwritten by major.
 	 * @param array $minor settings array to be overwritten by $major
 	 * @param array $major settings that overwrites thous in $minor
+	 * @return array
 	 */
 	protected function settingsMerge($minor, $major) {
 		$settings = $minor;

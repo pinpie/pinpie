@@ -8,7 +8,7 @@ class Snippet extends Tag {
 
 	public function getOutput() {
     $time_start = microtime(true);
-    $this->pinpie->totaltagsprocessed++;
+    $this->pinpie->totalSnippetsProcessed++;
     $this->filename = $this->getFilePath();
     $this->pinpie->times[] = [microtime(true), 'Tag #' . $this->index . ' ' . $this->tagpath . ' started processing'];
     if (!$this->doChecks()) {
@@ -26,9 +26,8 @@ class Snippet extends Tag {
       return false;
     }
     if ($this->settings['realpath check']) {
-      $path = $this->pinpie->checkPathIsInFolder($this->filename, $this->settings['folder']);
-      if ($path === false) {
-        $this->error('File path "' . $this->filename . '" does\'nt belongs to it\'s expected folder "' . $this->settings['folder'] . '".');
+      if (false === $this->pinpie->checkPathIsInFolder($this->filename, $this->settings['folder'])) {
+        $this->error('File path "' . $this->filename . '" does\'nt belong to it\'s expected folder "' . $this->settings['folder'] . '".');
         return false;
       }
     }
@@ -40,8 +39,8 @@ class Snippet extends Tag {
       $this->error('Maximum recursion level achieved');
       return false;
     }
-    if ($this->pinpie->totaltagsprocessed > 9999) {
-      $this->error('Over nine thousands tags processed. It\'s time to stop.');
+    if ($this->pinpie->totalSnippetsProcessed > 9999) {
+      $this->error('Over nine thousands snippets processed. It\'s time to take some rest.');
       return false;
     }
     return true;
@@ -97,6 +96,9 @@ class Snippet extends Tag {
 
 
   protected function getFilePath() {
+		if ($this->name === '' OR $this->name === false OR $this->name === null){
+			return false;
+		}
     $folder = '';
     if (!empty($this->settings['folder'])) {
       $folder = $this->settings['folder'];

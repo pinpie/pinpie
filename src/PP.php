@@ -14,7 +14,7 @@ class PP {
 		$document = null,
 		$template = 'default';
 	protected $tags = [];
-	public $depth = 0, $totaltagsprocessed = 0;
+	public $depth = 0, $totalSnippetsProcessed = 0;
 	protected $tagPath = [];
 	public $times = [],
 		$errors = [];

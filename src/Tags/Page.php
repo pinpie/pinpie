@@ -19,7 +19,7 @@ class Page extends Snippet {
 
   public function getOutput() {
     $time_start = microtime(true);
-    $this->pinpie->totaltagsprocessed++;
+    $this->pinpie->totalSnippetsProcessed++;
     $this->pinpie->times[]=[microtime(true), 'Tag #' . $this->index . ' ' . $this->tagpath . ' started processing'];
     $this->filename = $this->getFilePath();
     if (!$this->doChecks()) {
