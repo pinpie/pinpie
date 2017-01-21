@@ -10,7 +10,7 @@ class Staticon extends Tag {
 		$dimensions = [],
 		$gzip = false,
 		$gzipLevel = 1,
-		$minifie = false,
+		$minify = false,
 		$minifiedPath = false,
 		$minifiedURL = false,
 		$staticHash = false,
@@ -51,7 +51,7 @@ class Staticon extends Tag {
 		if (empty($this->settings['dimensions types'])) {
 			$this->settings['dimensions types'] = [];
 		}
-		$this->minifie = in_array($this->staticType, $this->settings['minify types']);
+		$this->minify = in_array($this->staticType, $this->settings['minify types']);
 		$this->gzip = in_array($this->staticType, $this->settings['gzip types']);
 		$this->pinpie->times[] = [microtime(true), '$this->filename = $this->getStaticPath();'];
 		$this->filename = $this->getStaticPath();
@@ -61,7 +61,7 @@ class Staticon extends Tag {
 			$this->error('file not found');
 			$this->filename = $this->value;
 		} else {
-			if ($this->minifie) {
+			if ($this->minify) {
 				$this->pinpie->times[] = [microtime(true), 'minification'];
 				$this->getMinified();
 				$this->pinpie->times[] = [microtime(true), 'minification done'];
@@ -92,11 +92,14 @@ class Staticon extends Tag {
 	}
 
 	public function getStaticUrl() {
+		if ($this->staticPath === '' OR $this->staticPath === false OR $this->staticPath === null){
+			return false;
+		}
 		if (!isset($this->c['getStaticUrl'])) {
 			$this->c['getStaticUrl'] = [];
 		}
 		if (!isset($this->c['getStaticUrl'][$this->filename])) {
-			if ($this->minifie AND $this->minifiedURL) {
+			if ($this->minify AND $this->minifiedURL) {
 				$file = $this->minifiedURL;
 			} else {
 				$file = $this->staticPath;
@@ -193,7 +196,7 @@ class Staticon extends Tag {
 	}
 
 	private function checkAndRunMinifier() {
-		if (!$this->minifie) {
+		if (!$this->minify) {
 			return false;
 		}
 		if (empty($this->settings['minify function'])) {

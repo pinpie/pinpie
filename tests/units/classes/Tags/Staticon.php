@@ -12,7 +12,7 @@ class Staticon extends atoum {
 			$this->testedInstance = new \pinpie\pinpie\Tags\Staticon(null, [], 'fulltag', 'type', 'placeholder', 'template', 'cachetime', 'fullname');
 		}
 
-		$settings = [
+		$defaults = [
 			'root' => realpath(__DIR__ . '/../../../filetests/statics'),
 			'file' => false,
 			'pinpie' => [
@@ -35,7 +35,21 @@ class Staticon extends atoum {
 		$this->function->gzwrite = true;
 
 
-		$pp = new \pinpie\pinpie\PP($settings);
+		$this
+			->assert('Empty')
+			->and($type = '%')
+			->and($fullname = 'js=')
+			->and($placeholder = '')
+			->and($template = '')
+			->and($cachetime = '')
+			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']')
+			->and($pp = new \pinpie\pinpie\PP($defaults));
+		$this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname);
+		$out = $this->testedInstance->getOutput();
+		$this
+			->array($this->testedInstance->errors)->size->isEqualTo(1)
+			->string($out)->isEqualTo('')
+			->then;
 
 
 		$this
@@ -45,7 +59,8 @@ class Staticon extends atoum {
 			->and($placeholder = '')
 			->and($template = '')
 			->and($cachetime = '')
-			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']');
+			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']')
+			->and($pp = new \pinpie\pinpie\PP($defaults));
 		$this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname);
 		$out = $this->testedInstance->getOutput();
 		$this
@@ -56,13 +71,29 @@ class Staticon extends atoum {
 			->function('gzwrite')->wasCalled()->once();
 
 		$this
+			->assert('Static relative js')
+			->and($type = '%')
+			->and($fullname = 'js=js.js')
+			->and($placeholder = '')
+			->and($template = '')
+			->and($cachetime = '')
+			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']')
+			->and($pp = new \pinpie\pinpie\PP($defaults))
+			->and($relurl = 'somepath')
+			->and($pp->url->path = $relurl)
+			->then($this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname))
+			->and($out = $this->testedInstance->getOutput())
+			->string($out)->startWith('<script type="text/javascript" src="//site.com/' . $relurl . '/js.js?time=');
+
+		$this
 			->assert('Static !js')
 			->and($type = '%')
 			->and($fullname = 'js=/js.js')
 			->and($placeholder = '')
 			->and($template = '')
 			->and($cachetime = '!')
-			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']');
+			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']')
+			->and($pp = new \pinpie\pinpie\PP($defaults));
 		$this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname);
 		$this
 			->string($this->testedInstance->getOutput())
@@ -76,7 +107,8 @@ class Staticon extends atoum {
 			->and($placeholder = '')
 			->and($template = '')
 			->and($cachetime = '')
-			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']');
+			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']')
+			->and($pp = new \pinpie\pinpie\PP($defaults));
 		$this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname);
 		$this
 			->then
@@ -94,7 +126,8 @@ class Staticon extends atoum {
 			->and($placeholder = '')
 			->and($template = '')
 			->and($cachetime = '')
-			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']');
+			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']')
+			->and($pp = new \pinpie\pinpie\PP($defaults));
 		$this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname);
 		$this
 			->then
@@ -112,7 +145,8 @@ class Staticon extends atoum {
 			->and($placeholder = '')
 			->and($template = 'stattemplate')
 			->and($cachetime = '')
-			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']');
+			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']')
+			->and($pp = new \pinpie\pinpie\PP($defaults));
 		$this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname);
 		$this
 			->then
@@ -236,7 +270,21 @@ class Staticon extends atoum {
 		$this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname);
 		$this->string($this->testedInstance->url)->isEqualTo('//site.com/min.js.js');
 
-
+		$this
+			->given($type = '%')
+			->and($fullname = 'js=/js.js')
+			->and($placeholder = '')
+			->and($template = '')
+			->and($cachetime = '')
+			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']')
+			->and($settings = $defaults)
+			->and($settings['tags'][$type]['minify types'] = [])
+			->and($pp = new \mock\pinpie\pinpie\PP($settings));
+		$this->calling($pp)->filemtime = function ($a) {
+			return 123;
+		};
+		$this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname);
+		$this->string($this->testedInstance->url)->isEqualTo('//site.com/js.js');
 
 		$this
 			->assert('with servers')
