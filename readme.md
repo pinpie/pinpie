@@ -10,8 +10,7 @@
 ## About
 PinPIE is lightweight php-based engine for small sites
 
-Read more about PinPIE engine in [PinPIE docs](http://pinpie.ru).
-
+Read more about PinPIE engine in [PinPIE docs](http://pinpie.ru)
 
 ## Overview
 
@@ -27,7 +26,7 @@ Content stored in files allows you to edit your content using favorite IDE or te
 This approach is friendly to version control systems — you can have versions of all your content to be safe and protected against loosing something while editing anything. Deployment friendly. Backup friendly.
 
 
-PinPIE have tag-based parser. Tag syntax is inspired by <a href="https://modx.com/">ModX</a> tag system.
+PinPIE have tag-based parser. Tag syntax is inspired by [ModX](https://modx.com/) tag system.
 Basic tags are:
 
 - Chunks — a pieces of plain text
@@ -64,8 +63,39 @@ That snippet will be cached for PHP_INT_MAX seconds, which is a lot.
 You don't need to purge cache yourself every time you change something important on the site. PinPIE will automatically recache only changed content. But anyway, you can purge the cache if you want.
 Read more in [cache readme](http://pinpie.ru/en/manual/cache).
 
-
 Read more about PinPIE engine in [PinPIE docs](http://pinpie.ru).
+
+
+
+##Examples
+
+Look at this example of some possible page:
+
+```HTML
+[title[=Hello]]
+<h1>[[*title]]</h1>
+<p>Hi!</p>
+<p>The answer is [[$rand]].</p>
+[[%img=/images/someimage.jpg]]
+<p>Now visit <a href="/about">another page</a>.</p>
+[[lorem/ipsum]]
+```
+
+Here the `[title[=Hello]]` is a constant with some text. In this example it goes into the placeholder `[[*title]]`. That placeholder is used in the `<h1>` tag, and in the same time let's assume it is used also in the `<title>` tag in the template. In that way, this text will appear on the page as a heading and in the head of the page in title.
+
+The snippet `[[$rand]]` will run PHP code from file `/snippets/rand` and will output a random number.
+
+The static tag `[[%img=/images/someimage.jpg]]` is very convenient way to use images, css and js files on the page. It will automatically output something like:
+```HTML
+<img src="//test.ru/images/someimage.jpg?time=4134cb552b4782d97e3450bfa42eb049" width="640" height="427">
+```
+You can see a `time` hash to make changed static files updated in browser.  
+Also PinPIE add the image width and height automatically. 
+This behavior can be changed in config.
+
+Chunk `[[lorem/ipsum]]` is just a piece of text in a `/chunks/lorem/ipsum` folder.
+
+You can find more examples in [other PinPIE repos](https://github.com/pinpie) or at [PinPIE site](http://pinpie.ru/en/examples).
 
 ## Start using PinPIE
 You can install PinPIE with composer:
