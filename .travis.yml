@@ -15,10 +15,11 @@ before_script:
 
   # No xml report for PHP 5.4
   - if [[ "$(php -v | grep 'PHP 5.4')" ]]; then composer remove atoum/reports-extension; fi
+  # composer
+  - composer self-update
+  - composer install --prefer-source --no-interaction --dev
 
 script: vendor/bin/atoum -c tests/travis.cfg.php
-#script: vendor/bin/atoum -f tests/units/classes/Tags/Staticon.php
-
 
 after_success:
     - bash <(curl -s https://codecov.io/bash)

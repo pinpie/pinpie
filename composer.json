@@ -24,6 +24,9 @@
   "autoload": {
     "psr-4": {
       "pinpie\\pinpie\\": "src"
-    }
+    },
+    "exclude-from-classmap": [
+      "/tests/"
+    ]
   }
 }

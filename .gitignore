@@ -2,6 +2,6 @@
 .idea
 nbproject
 vendor
-coverate.xml
+coverage.xml
 composer.lock
 

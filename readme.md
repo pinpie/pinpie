@@ -68,9 +68,18 @@ Read more in [cache readme](http://pinpie.ru/en/manual/cache).
 Read more about PinPIE engine in [PinPIE docs](http://pinpie.ru).
 
 ## Start using PinPIE
-You can install PinPIE with composer or download code from GitHub. You can find more detailed instructions in [start unsing PinPIE](http://pinpie.ru/en/manual/start) docs.
+You can install PinPIE with composer:
 
-Read more about PinPIE engine in [PinPIE docs](http://pinpie.ru).
+```
+composer require "pinpie/pinpie"
+composer install
+```
+
+Or download code from GitHub and use standalone autoloader file `/pinpie/src/autoload.php`.
+
+You can find more detailed instructions in [start unsing PinPIE](http://pinpie.ru/en/manual/start) docs.
+
+
 
 ## Credits
 Author and maintainer of PinPIE is Igor Data ([@igordata](https://github.com/igordata))
