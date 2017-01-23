@@ -72,13 +72,50 @@ Read more about PinPIE engine in [PinPIE docs](http://pinpie.ru).
 Look at this example of some possible page:
 
 ```HTML
+<!-- A title text. It goes to placeholder in the template -->
 [title[=Hello]]
-<h1>[[*title]]</h1>
+
 <p>Hi!</p>
+
+<!-- A snippet of PHP code, it outputs some random number each time page is rendered. -->
 <p>The answer is [[$rand]].</p>
-[[%img=/images/someimage.jpg]]
+
+<!-- A static tag. It will be rendered as <img... with width and height (optional), see below -->
+[[%img=/images/cat.jpg]]
+
 <p>Now visit <a href="/about">another page</a>.</p>
+
+<!-- A chunk tag. Piece of plain text which can be used anywhere. -->
 [[lorem/ipsum]]
+```
+
+After page is processed, its HTML code will look like that:
+
+```HTML
+...
+<!-- Article and header are located in the template.
+ Title was set in the template with a placeholder.
+ You can find template code below. -->
+<article>
+  <header>
+    <h1>Hello</h1>
+  </header>
+  
+<!-- A title text. It is now above this line. -->
+
+<p>Hi!</p>
+
+<!-- A snippet of PHP code generated a number. -->
+<p>The answer is 453.</p>
+
+<!-- A static tag become an image with a hash preventing caching changed files.
+  That hash will remain the same until file is changed. -->
+<img src="//test.ru/images/cat-1.jpg?time=d9c8899d5833a0616ad2aef0bc2229cd" width="640" height="427">
+
+<p>Now visit <a href="/about">another page</a>.</p>
+
+<!-- A chunk tag. Piece of plain text which can be used anywhere. -->
+<p>Lorem ipsum dolor sit amet...
 ```
 
 Here the `[title[=Hello]]` is a constant with some text. In this example it goes into the placeholder `[[*title]]`. That placeholder is used in the `<h1>` tag, and in the same time let's assume it is used also in the `<title>` tag in the template. In that way, this text will appear on the page as a heading and in the head of the page in title.
