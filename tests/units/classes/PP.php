@@ -7,7 +7,7 @@ use pinpie\pinpie\Tags\Constant;
 
 class PP extends atoum {
 
-	public function test_pages() {
+	public function ntest_pages() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -52,7 +52,7 @@ class PP extends atoum {
 		$this->string($this->testedInstance->render())->isEqualTo('some page');
 	}
 
-	public function test_chunks() {
+	public function ntest_chunks() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -99,7 +99,7 @@ class PP extends atoum {
 			->isEqualTo('a chunk in another chunk');
 	}
 
-	public function test_snippets() {
+	public function ntest_snippets() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -147,7 +147,7 @@ class PP extends atoum {
 			->isEqualTo('a snippet in another snippet');
 	}
 
-	public function test_tagtemplates() {
+	public function ntest_tagtemplates() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -179,7 +179,7 @@ class PP extends atoum {
 			->isEqualTo('a snippet with template');
 	}
 
-	public function test_raw() {
+	public function ntest_raw() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -201,7 +201,7 @@ class PP extends atoum {
 		$this->string($this->testedInstance->render())->isEqualTo('[[chunk]]');
 	}
 
-	public function test_preinclude() {
+	public function ntest_preinclude() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -259,7 +259,7 @@ class PP extends atoum {
 
 	}
 
-	function test_report() {
+	public function ntest_report() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -297,7 +297,7 @@ class PP extends atoum {
 		$this->string($this->testedInstance->report())->contains('Errors:');
 	}
 
-	function test_reportTags() {
+	public function ntest_reportTags() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -324,6 +324,121 @@ class PP extends atoum {
 		$this->newTestedInstance($settings);
 		$this->testedInstance->template = false;
 		$this->string($this->testedInstance->reportTags())->contains('<tr><td>fulltag</td><td>PAGE index.php</td></tr>');
+
+	}
+
+	public function test_getHashURL() {
+
+		if (false) {
+			$this->testedInstance = new \pinpie\pinpie\PP();
+		}
+
+
+		$defaults = [
+			'root' => '',
+			'file' => false,
+			'pinpie' => [
+				'cache class' => '\pinpie\pinpie\Cachers\Disabled',
+				'cache rules' => [
+					200 => [
+						'ignore url' => false,
+						'ignore query params' => false,
+					]
+				],
+			],
+		];
+
+
+		$this
+			->assert('empty url')
+			->if($settings = $defaults)
+			->if($this->newTestedInstance($settings))
+			->and(http_response_code(200))
+			->and($this->testedInstance->url->path = '')
+			->and($this->testedInstance->url->query = '')
+			->array($this->testedInstance->getHashURL())
+			->isEqualTo(['url path' => '', 'url query' => ''])
+			->then;
+		$this
+			->assert('empty url')
+			->if($settings = $defaults)
+			->and($settings['pinpie']['cache rules'][200]['ignore url'] = true)
+			->if($this->newTestedInstance($settings))
+			->and(http_response_code(200))
+			->and($this->testedInstance->url->path = '')
+			->and($this->testedInstance->url->query = '')
+			->array($this->testedInstance->getHashURL())
+			->isEqualTo(['url path' => '', 'url query' => ''])
+			->then;
+
+		$this
+			->assert('/')
+			->if($settings = $defaults)
+			->if($this->newTestedInstance($settings))
+			->and(http_response_code(200))
+			->and($this->testedInstance->url->path = '/')
+			->and($this->testedInstance->url->query = '')
+			->array($this->testedInstance->getHashURL())
+			->isEqualTo(['url path' => '/', 'url query' => ''])
+			->then;
+
+		$this
+			->assert('/someurl')
+			->if($settings = $defaults)
+			->if($this->newTestedInstance($settings))
+			->and(http_response_code(200))
+			->and($this->testedInstance->url->path = '/someurl')
+			->and($this->testedInstance->url->query = 'param1=val1')
+			->array($this->testedInstance->getHashURL())
+			->isEqualTo(['url path' => '/someurl', 'url query' => 'param1=val1'])
+			->then;
+
+		$this
+			->assert('/some/long/url')
+			->if($settings = $defaults)
+			->if($this->newTestedInstance($settings))
+			->and(http_response_code(200))
+			->and($this->testedInstance->url->path = '/some/long/url')
+			->and($this->testedInstance->url->query = '')
+			->array($this->testedInstance->getHashURL())
+			->isEqualTo(['url path' => '/some/long/url', 'url query' => ''])
+			->then;
+
+		$this
+			->assert('/some/long/url with param1')
+			->if($settings = $defaults)
+			->if($this->newTestedInstance($settings))
+			->and(http_response_code(200))
+			->and($this->testedInstance->url->path = '/some/long/url')
+			->and($this->testedInstance->url->query = 'param1=val1')
+			->array($this->testedInstance->getHashURL())
+			->isEqualTo(['url path' => '/some/long/url', 'url query' => 'param1=val1'])
+			->then;
+
+		$this
+			->assert('/some/long/url with param1 and param2')
+			->if($settings = $defaults)
+			->if($this->newTestedInstance($settings))
+			->and(http_response_code(200))
+			->and($this->testedInstance->url->path = '/some/long/url')
+			->and($this->testedInstance->url->query = 'param1=val1&param2=val2')
+			->array($this->testedInstance->getHashURL())
+			->isEqualTo(['url path' => '/some/long/url', 'url query' => 'param1=val1&param2=val2'])
+			->then;
+
+
+		$this
+			->assert('/some/long/url with param1 and param2, ignoring param1')
+			->if($settings = $defaults)
+			->and($settings['pinpie']['cache rules'][200]['ignore query params'] = ['param1'])
+			->if($this->newTestedInstance($settings))
+			->and(http_response_code(200))
+			->and($this->testedInstance->url->path = '/some/long/url')
+			->and($this->testedInstance->url->query = 'param1=val1&param2=val2')
+			->array($this->testedInstance->getHashURL())
+			->isEqualTo(['url path' => '/some/long/url', 'url query' => 'param2=val2'])
+			->then;
+
 
 	}
 }

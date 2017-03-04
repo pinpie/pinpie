@@ -2,6 +2,7 @@
 
 namespace pinpie\pinpie;
 
+use mageekguy\atoum\asserters\boolean;
 use pinpie\pinpie\Tags\Tag;
 
 
@@ -346,11 +347,15 @@ class PP {
 		}
 	}
 
-
+	/**
+	 * @var bool|array cache for once calculated by $this->getHashURL() value
+	 */
 	protected $hashURL = false;
 
-	/** Not a part of API. Used by tags for caching purposes. Never used outside PP class.
-	 * @return array
+	/**
+	 * Do not use this method. Not a part of API. Used by tags for caching purposes only. Never called from outside of PP class.
+	 * Creates array with specific URL params to be used in hashing tag functions.
+	 * @return bool|array
 	 */
 	public function getHashURL() {
 		if ($this->hashURL !== false) {
@@ -371,10 +376,14 @@ class PP {
 		if ($rules['ignore url']) {
 			$url['path'] = '';
 		}
-		//Should we ignore all (true) or some (array) of get-params of url, or make it separately. Mean cache of "?page=3" differs from "?page=100".
+		//Should we ignore all (true) or some (array) of get-params of url, or make it separately? E.g. cache of "?page=3" differs from "?page=100".
 		if ($rules['ignore query params'] === true) {
 			$url['query'] = '';
 		} else {
+			if ($rules['ignore query params'] === false OR $rules['ignore query params'] === null) {
+				/* prevent foreach warning */
+				$rules['ignore query params'] = [];
+			}
 			parse_str($url['query'], $url['query']);
 			foreach ($rules['ignore query params'] as $p) {
 				if (isset($url['query'][$p])) {

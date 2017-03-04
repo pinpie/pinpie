@@ -8,6 +8,7 @@ use \pinpie\pinpie\PP as PP;
 class Staticon extends Tag {
 	public
 		$dimensions = [],
+		$fileExist = false,
 		$gzip = false,
 		$gzipLevel = 1,
 		$minify = false,
@@ -22,26 +23,52 @@ class Staticon extends Tag {
 	 * Internal cache for any computed values like url
 	 * @var array
 	 */
-	private $c = [];
+	protected $c = [];
 
 	public function __construct(PP $pinpie, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, Tag $parentTag = null, $priority = 10000, $depth = 0) {
 		parent::__construct($pinpie, $settings, $fulltag, $type, $placeholder, $template, $cachetime, $fullname, $parentTag, $priority, $depth);
-		$this->pinpie->times[] = [microtime(true), 'static ' . $fulltag . ' construct started'];
+		$this->pinpie->times[] = [microtime(true), 'static ' . $this->fulltag . ' construct started'];
 		if (!isset($this->pinpie->inCa['static'])) {
 			$this->pinpie->inCa['static'] = [];
 		}
 		$this->c = &$this->pinpie->inCa['static'];
 
-		$this->staticType = $this->name;
-		$this->staticPath = $this->value . (!empty($this->params) ? '?' . implode('&', $this->params) : '');
+		$this->prepareSettings();
+		$this->prepareStaticPath();
 
-		if (empty($this->staticPath)) {
-			$this->error($fulltag . ' static file path is empty');
+		$this->filename = $this->getStaticPath();
+		if ($this->filename === false) {
+			$this->fileExist = false;
+			$this->error('file not found');
+			/* Required for relative paths or paths where file was not found.
+			 The HTML tag will be generated anyway based on $this->value value. */
+			$this->filename = $this->value;
+		} else {
+			$this->fileExist = true;
+		}
+
+		$this->process();
+		$this->url = $this->getStaticUrl();
+	}
+
+	/**
+	 * Checks and trims static path. Logs error if static path is empty.
+	 */
+	protected function prepareStaticPath() {
+		$this->staticPath = $this->value . (!empty($this->params) ? '?' . implode('&', $this->params) : '');
+		if ($this->staticPath === '' OR $this->staticPath === false OR $this->staticPath === null) {
+			$this->error($this->fulltag . ' static file path is empty');
 		} else {
 			if ($this->staticPath{0} !== '/') {
 				$this->staticPath = rtrim($this->pinpie->url->path, '/') . '/' . $this->staticPath;
 			}
 		}
+	}
+
+	/**
+	 * Sets some settings to empty arrays if they are false or null.
+	 */
+	protected function prepareSettings() {
 		if (empty($this->settings['minify types'])) {
 			$this->settings['minify types'] = [];
 		}
@@ -51,40 +78,6 @@ class Staticon extends Tag {
 		if (empty($this->settings['dimensions types'])) {
 			$this->settings['dimensions types'] = [];
 		}
-		$this->minify = in_array($this->staticType, $this->settings['minify types']);
-		$this->gzip = in_array($this->staticType, $this->settings['gzip types']);
-		$this->pinpie->times[] = [microtime(true), '$this->filename = $this->getStaticPath();'];
-		$this->filename = $this->getStaticPath();
-		$this->pinpie->times[] = [microtime(true), '$this->filename = $this->getStaticPath(); done, path is ' . $this->filename];
-
-		if (empty($this->filename)) {
-			$this->error('file not found');
-			$this->filename = $this->value;
-		} else {
-			if ($this->minify) {
-				$this->pinpie->times[] = [microtime(true), 'minification'];
-				$this->getMinified();
-				$this->pinpie->times[] = [microtime(true), 'minification done'];
-			}
-
-			if ($this->gzip) {
-				$this->pinpie->times[] = [microtime(true), 'gzip'];
-				$this->checkAndRunGzip();
-				$this->pinpie->times[] = [microtime(true), 'gzip done'];
-			}
-
-			if (in_array($this->staticType, $this->settings['dimensions types'])) {
-				$this->pinpie->times[] = [microtime(true), 'getDimensions'];
-				$this->dimensions = $this->getDimensions();
-				$this->pinpie->times[] = [microtime(true), 'getDimensions done'];
-			}
-
-			$this->filetime = $this->pinpie->filemtime($this->filename);
-			$this->staticHash = $this->getStaticHash();
-		}
-		$this->pinpie->times[] = [microtime(true), 'getStaticUrl'];
-		$this->url = $this->getStaticUrl();
-		$this->pinpie->times[] = [microtime(true), 'getStaticUrl done'];
 	}
 
 	public function getStaticHash() {
@@ -92,7 +85,7 @@ class Staticon extends Tag {
 	}
 
 	public function getStaticUrl() {
-		if ($this->staticPath === '' OR $this->staticPath === false OR $this->staticPath === null){
+		if ($this->staticPath === '' OR $this->staticPath === false OR $this->staticPath === null) {
 			return false;
 		}
 		if (!isset($this->c['getStaticUrl'])) {
@@ -110,7 +103,7 @@ class Staticon extends Tag {
 	}
 
 
-	private function getStaticPath() {
+	protected function getStaticPath() {
 		if (!isset($this->c['getStaticPath'])) {
 			$this->c['getStaticPath'] = [];
 		}
@@ -121,7 +114,7 @@ class Staticon extends Tag {
 		return $this->c['getStaticPath'][$this->staticPath];
 	}
 
-	private function getStaticPathReal() {
+	protected function getStaticPathReal() {
 		$path = rtrim($this->settings['folder'], '/\\') . DIRECTORY_SEPARATOR . ltrim($this->staticPath, '/\\');
 		$this->pinpie->times[] = [microtime(true), 'processing static path ' . $path];
 		if ($this->settings['realpath check']) {
@@ -169,7 +162,7 @@ class Staticon extends Tag {
 		return $this->url;
 	}
 
-	private function checkAndRunGzip() {
+	protected function checkAndRunGzip() {
 		$r = false;
 		if (!$this->checkMTime($this->filename, $this->filename . '.gz')) {
 			$this->pinpie->times[] = [microtime(true), '#gzipping start ' . $this->filename];
@@ -195,7 +188,7 @@ class Staticon extends Tag {
 		return $r;
 	}
 
-	private function checkAndRunMinifier() {
+	protected function checkAndRunMinifier() {
 		if (!$this->minify) {
 			return false;
 		}
@@ -240,7 +233,7 @@ class Staticon extends Tag {
 	 * @param $newer
 	 * @return bool
 	 */
-	private function checkMTime($older, $newer) {
+	protected function checkMTime($older, $newer) {
 		$molder = $this->pinpie->filemtime($older);
 		$mnewer = $this->pinpie->filemtime($newer);
 		if ($molder !== false AND $mnewer !== false AND $molder <= $mnewer) {
@@ -253,7 +246,7 @@ class Staticon extends Tag {
 	/**
 	 * Looks for minified version of the file in the static folder.
 	 */
-	private function getMinified() {
+	protected function getMinified() {
 		$this->pinpie->times[] = [microtime(true), 'getMinified'];
 		if (!isset($this->c['getMinified'])) {
 			$this->c['getMinified'] = [];
@@ -365,5 +358,38 @@ class Staticon extends Tag {
 		}
 		return '';
 	}
+
+	protected function process() {
+
+		$this->staticType = $this->name;
+		$this->minify = in_array($this->staticType, $this->settings['minify types']);
+		$this->gzip = in_array($this->staticType, $this->settings['gzip types']);
+
+		if (!$this->fileExist) {
+			return null;
+		}
+
+		if ($this->minify) {
+			$this->pinpie->times[] = [microtime(true), 'minification'];
+			$this->getMinified();
+			$this->pinpie->times[] = [microtime(true), 'minification done'];
+		}
+
+		if ($this->gzip) {
+			$this->pinpie->times[] = [microtime(true), 'gzip'];
+			$this->checkAndRunGzip();
+			$this->pinpie->times[] = [microtime(true), 'gzip done'];
+		}
+
+		if (in_array($this->staticType, $this->settings['dimensions types'])) {
+			$this->pinpie->times[] = [microtime(true), 'getDimensions'];
+			$this->dimensions = $this->getDimensions();
+			$this->pinpie->times[] = [microtime(true), 'getDimensions done'];
+		}
+
+		$this->filetime = $this->pinpie->filemtime($this->filename);
+		$this->staticHash = $this->getStaticHash();
+	}
+
 
 }
