@@ -23,3 +23,8 @@ script: vendor/bin/atoum -c tests/travis.cfg.php
 
 after_success:
     - bash <(curl -s https://codecov.io/bash)
+
+addons:
+  code_climate:
+    repo_token: f54a45771b2cdaa50cc762c489a20d4b5e9bdb0f32161874e705585baa02bade
+
