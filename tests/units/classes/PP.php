@@ -7,7 +7,7 @@ use pinpie\pinpie\Tags\Constant;
 
 class PP extends atoum {
 
-	public function ntest_pages() {
+	public function test_pages() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -52,7 +52,7 @@ class PP extends atoum {
 		$this->string($this->testedInstance->render())->isEqualTo('some page');
 	}
 
-	public function ntest_chunks() {
+	public function test_chunks() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -99,7 +99,7 @@ class PP extends atoum {
 			->isEqualTo('a chunk in another chunk');
 	}
 
-	public function ntest_snippets() {
+	public function test_snippets() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -147,7 +147,7 @@ class PP extends atoum {
 			->isEqualTo('a snippet in another snippet');
 	}
 
-	public function ntest_tagtemplates() {
+	public function test_tagtemplates() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -179,7 +179,7 @@ class PP extends atoum {
 			->isEqualTo('a snippet with template');
 	}
 
-	public function ntest_raw() {
+	public function test_raw() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -201,7 +201,7 @@ class PP extends atoum {
 		$this->string($this->testedInstance->render())->isEqualTo('[[chunk]]');
 	}
 
-	public function ntest_preinclude() {
+	public function test_preinclude() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -259,7 +259,7 @@ class PP extends atoum {
 
 	}
 
-	public function ntest_report() {
+	public function test_report() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
@@ -297,7 +297,7 @@ class PP extends atoum {
 		$this->string($this->testedInstance->report())->contains('Errors:');
 	}
 
-	public function ntest_reportTags() {
+	public function test_reportTags() {
 		if (false) {
 			$this->testedInstance = new \pinpie\pinpie\PP();
 		}
