@@ -4,7 +4,7 @@ $runner->addTestsFromDirectory(__DIR__ . '/units');
 $script->addDefaultReport();
 
 
-if (PHP_MAJOR_VERSION === 5 AND PHP_MINOR_VERSION > 4) {
+if (PHP_MAJOR_VERSION === 7 OR PHP_MAJOR_VERSION === 5 AND PHP_MINOR_VERSION > 4) {
 	$cloverWriter = new atoum\writers\file('coverage.xml');
 	$cloverReport = new atoum\reports\asynchronous\clover();
 	$cloverReport->addWriter($cloverWriter);
