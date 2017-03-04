@@ -8,8 +8,8 @@ php:
 
 before_script:
   # APCu vs APCu
-  - if [[ "$(php -v | grep 'PHP 5')" ]]; then echo yes | pecl install apcu-4.0.8; composer require atoum/atoum; fi
-  - if [[ "$(php -v | grep 'PHP 7')" ]]; then echo yes | pecl install apcu; composer require atoum/atoum:dev-3.0.0-dev; fi
+  - if [[ "$(php -v | grep 'PHP 5')" ]]; then echo yes | pecl install apcu-4.0.8; composer require atoum/atoum:2.9.0; fi
+  - if [[ "$(php -v | grep 'PHP 7')" ]]; then echo yes | pecl install apcu; composer require atoum/atoum; fi
   #- echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - phpenv config-add tests/apc.ini
 
