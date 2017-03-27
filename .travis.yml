@@ -1,9 +1,9 @@
 language: php
 php:
-  - '5.4'
-  - '5.5'
-  - '5.6'
-  - '7.0'
+  #- '5.4'
+  #- '5.5'
+  #- '5.6'
+  #- '7.0'
   - '7.1'
 
 before_script:
@@ -17,7 +17,7 @@ before_script:
   # composer
   - composer self-update
   - composer install --prefer-source --no-interaction --dev
-  - php -i
+  - php -i | grep 'apc'
 
 script: vendor/bin/atoum -c tests/travis.cfg.php
 
