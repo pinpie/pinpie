@@ -9,7 +9,7 @@ class APCu extends Cacher {
   protected $bc = false;
 
   public function __construct(PP $pinpie, array $settings = []) {
-    if (function_exists('apc_fetch')) {
+    if (\function_exists('apc_fetch')) {
       $this->bc = true;
     }
     parent::__construct($pinpie, $settings);
@@ -18,18 +18,18 @@ class APCu extends Cacher {
   public function get(Tag $tag) {
     $hash = $this->getHash($tag);
     if ($this->bc) {
-      return apc_fetch($hash);
+      return \apc_fetch($hash);
     } else {
-      return apcu_fetch($hash);
+      return \apcu_fetch($hash);
     }
   }
 
   public function set(Tag $tag, $data, $time = 0) {
     $hash = $this->getHash($tag);
     if ($this->bc) {
-      return apc_store($hash, $data, $time);
+      return \apc_store($hash, $data, $time);
     } else {
-      return apcu_store($hash, $data, $time);
+      return \apcu_store($hash, $data, $time);
     }
   }
 
