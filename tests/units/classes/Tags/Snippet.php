@@ -36,6 +36,21 @@ class Snippet extends atoum {
 			->then;
 
 		$this
+			->assert('Zero')
+			->if($pp = new PP($settings))
+			->and($type = '$')
+			->and($fullname = '0')
+			->and($placeholder = '')
+			->and($template = '')
+			->and($cachetime = '')
+			->and($fulltag = '[' . $placeholder . '[' . $cachetime . $type . $fullname . ']' . $template . ']')
+			->given($this->newTestedInstance($pp, $pp->conf->tags[$type], $fulltag, $type, $placeholder, $template, $cachetime, $fullname))
+			->then
+			->string($this->testedInstance->getOutput())
+			->isEqualTo('It\'s a snippet named 0')
+			->then;
+
+		$this
 			->assert('Snippet with template')
 			->if($pp = new PP($settings))
 			->and($type = '$')

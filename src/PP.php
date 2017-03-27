@@ -218,12 +218,12 @@ class PP {
 		*/
 		$fulltag = $matches[0];
 		$type = $matches[3];
-		$placeholder = ($matches[1] == '' ? false : $matches[1]);
-		$template = ($matches[5] == '' ? false : $matches[5]);
+		$placeholder = ($matches[1] === '' ? false : $matches[1]);
+		$template = ($matches[5] === '' ? false : $matches[5]);
 		if ($matches[2] === '!') {
 			$cachetime = $this->conf->pinpie['cache forever time'];
 		} else {
-			$cachetime = ($matches[2] == '' ? 0 : (int)$matches[2]);
+			$cachetime = ($matches[2] === '' ? 0 : (int)$matches[2]);
 		}
 		$fullname = $matches[4];
 
