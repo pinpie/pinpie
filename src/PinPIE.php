@@ -4,7 +4,7 @@ namespace pinpie\pinpie;
 
 class PinPIE {
 	/** @var null|PP */
-	public static $pinpie = null;
+	public static $pp = null;
 	/** @var null|Config */
 	public static $conf = null;
 	/** @var null|URL */
@@ -17,7 +17,7 @@ class PinPIE {
 	 * @return null|Cachers\Cacher
 	 */
 	public static function cacherGet() {
-		return static::$pinpie->cacher;
+		return static::$pp->cacher;
 	}
 
 	/**
@@ -26,7 +26,7 @@ class PinPIE {
 	 * @return Cachers\Cacher
 	 */
 	public static function cacherSet(Cachers\Cacher $cacher) {
-		return static::$pinpie->cacher = $cacher;
+		return static::$pp->cacher = $cacher;
 	}
 
 	/**
@@ -36,7 +36,7 @@ class PinPIE {
 	 * @return bool|string False on fail, or $path on success
 	 */
 	public static function checkPathIsInFolder($path, $folder) {
-		return static::$pinpie->checkPathIsInFolder($path, $folder);
+		return static::$pp->checkPathIsInFolder($path, $folder);
 	}
 
 	/**
@@ -45,31 +45,31 @@ class PinPIE {
 	 * @return bool|URL
 	 */
 	public function getUrlInfo($url) {
-		return static::$pinpie->getUrlInfo($url);
+		return static::$pp->getUrlInfo($url);
 	}
 
 	/**
 	 * Creates new instance of PP class - the main class of PinPIE and do all the work to draw the page.
 	 * @param bool|array $settings PinPIE settings could be passed as array. If false or empty array - PinPIE will look for file in /config folder.
 	 */
-	public static function newInstance($settings = false) {
+	public static function renderPage($settings = false) {
 		try {
-			$pinpie = new PP($settings);
-			static::$pinpie = &$pinpie;
-			static::$conf = &$pinpie->conf;
-			static::$url = &$pinpie->url;
-			static::$template = &$pinpie->template;
-			echo $pinpie->render();
+			$pp = new PP($settings);
+			static::$pp = &$pp;
+			static::$conf = &$pp->conf;
+			static::$url = &$pp->url;
+			static::$template = &$pp->template;
+			echo $pp->render();
 		} catch (NewPageException $np) {
 			ob_end_clean();
 			$settings['page'] = $np->page;
-			static::newInstance($settings);
+			static::renderPage($settings);
 		}
 	}
 
 	/**
 	 * Makes PinPIE to stop the work, recreate main instance and load $page file.
-	 * Throws exception, which is handled in PinPIE::newInstance() method.
+	 * Throws exception, which is handled in PinPIE::renderPage() method.
 	 * @param String $page
 	 * @throws NewPageException
 	 */
@@ -83,7 +83,7 @@ class PinPIE {
 	 * @return String
 	 */
 	public static function parseString($string) {
-		return static::$pinpie->parseString($string);
+		return static::$pp->parseString($string);
 	}
 
 	/**
@@ -92,7 +92,7 @@ class PinPIE {
 	 * @return string
 	 */
 	public static function report() {
-		return static::$pinpie->report();
+		return static::$pp->report();
 	}
 
 	/**
@@ -101,7 +101,7 @@ class PinPIE {
 	 * @return string
 	 */
 	public static function reportTags() {
-		return static::$pinpie->reportTags();
+		return static::$pp->reportTags();
 	}
 
 	/**
@@ -109,7 +109,7 @@ class PinPIE {
 	 * @return string
 	 */
 	public static function templateGet() {
-		return static::$pinpie->template;
+		return static::$pp->template;
 	}
 
 	/**
@@ -118,17 +118,27 @@ class PinPIE {
 	 * @return mixed
 	 */
 	public static function templateSet($template) {
-		return static::$pinpie->template = $template;
+		return static::$pp->template = $template;
 	}
 
 	/**
 	 * Puts string into the placeholder.
 	 * @param string $name
 	 * @param string $content
-	 * @return mixed
 	 */
 	public static function varPut($name, $content) {
-		return static::$pinpie->vars[$name][100000][] = $content;
+		static::$pp->vars[$name][100000][] = $content;
+	}
+
+	/**
+	 * Replaces placeholder content.
+	 * @param string $name
+	 * @param string $content
+	 */
+	public static function varReplace($name, $content) {
+		static::$pp->vars[$name] = [
+			100000 => [$content]
+		];
 	}
 
 

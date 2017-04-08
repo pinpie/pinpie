@@ -177,6 +177,22 @@ class PP extends atoum {
 		$this
 			->string($this->testedInstance->render())
 			->isEqualTo('a snippet with template');
+
+		$this
+			->assert('placeholder default value')
+			->given($_SERVER['REQUEST_URI'] = '/placeholder-default-value');
+		$this->newTestedInstance($settings);
+		$this
+			->string($this->testedInstance->render())
+			->isEqualTo('some default value');
+
+		$this
+			->assert('placeholder default value not so default')
+			->given($_SERVER['REQUEST_URI'] = '/placeholder-default-value-not');
+		$this->newTestedInstance($settings);
+		$this
+			->string($this->testedInstance->render())
+			->isEqualTo('this is not default');
 	}
 
 	public function test_raw() {

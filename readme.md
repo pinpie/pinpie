@@ -1,9 +1,9 @@
 [![PinPIE](https://img.shields.io/badge/PHP-PinPIE-brightgreen.svg)](http://pinpie.ru/)
 [![Latest Stable Version](https://img.shields.io/packagist/v/pinpie/pinpie.svg)](https://packagist.org/packages/pinpie/pinpie)
-[![Total Downloads](https://img.shields.io/packagist/dt/pinpie/pinpie.svg)](https://packagist.org/packages/pinpie/pinpie)
-[![codecov](https://codecov.io/gh/pinpie/pinpie/branch/stable/graph/badge.svg)](https://codecov.io/gh/pinpie/pinpie)
 [![Build Status](http://img.shields.io/travis/pinpie/pinpie.svg)](https://travis-ci.org/pinpie/pinpie)
+[![codecov](https://codecov.io/gh/pinpie/pinpie/branch/stable/graph/badge.svg)](https://codecov.io/gh/pinpie/pinpie)
 [![Code Climate](https://codeclimate.com/github/pinpie/pinpie/badges/gpa.svg)](https://codeclimate.com/github/pinpie/pinpie)
+[![Total Downloads](https://img.shields.io/packagist/dt/pinpie/pinpie.svg)](https://packagist.org/packages/pinpie/pinpie)
 [![License](https://img.shields.io/packagist/l/pinpie/pinpie.svg)](https://packagist.org/packages/pinpie/pinpie)
 
 #PinPIE - when PHP Is Enough

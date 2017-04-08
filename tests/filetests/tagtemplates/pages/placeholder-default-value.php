@@ -1,0 +1,1 @@
+[[@template=placeholder-default-value]]
