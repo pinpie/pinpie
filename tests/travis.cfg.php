@@ -16,3 +16,6 @@ if (PHP_MAJOR_VERSION === 7 OR PHP_MAJOR_VERSION === 5 AND PHP_MINOR_VERSION > 4
 	$telemetry->setProjectName('pinpie/pinpie');
 	$runner->addReport($telemetry);
 }
+
+
+
