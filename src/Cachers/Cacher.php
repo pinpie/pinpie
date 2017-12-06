@@ -32,7 +32,8 @@ class Cacher {
       return $tag->hash;
     }
     $tag->hashBase = $this->hashBase($tag);
-    $tag->hash = $tag->type . '.' . hash($this->settings['algo'], implode("\n", $tag->hashBase) . $this->settings['random stuff'], $this->settings['raw hash']);
+    /* I recommend use letters and digits only. Had issue with APCu not accepting $ in hash string. */
+    $tag->hash = hash($this->settings['algo'], implode("\n", $tag->hashBase) . $this->settings['random stuff'], $this->settings['raw hash']);
     return $tag->hash;
   }
 

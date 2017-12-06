@@ -10,7 +10,7 @@ class Config {
 	// descriptions are in ReadConf()
 	public
 		$cache = null,
-		$oth = null,
+		$other = null,
 		$databases = null,
 		/** @var \pinpie\pinpie\PP|null */
 		$root = null,
@@ -40,7 +40,7 @@ class Config {
 		}
 		$settings = $this->settingsMerge($defaults, $settings);
 		$this->cache = $settings['cache'];
-		$this->oth = $settings['oth'];
+		$this->other = $settings['other'];
 		$this->databases = $settings['databases'];
 		$this->pinpie = $settings['pinpie'];
 		$this->debug = $settings['debug'];
@@ -79,7 +79,7 @@ class Config {
 
 	public function getDefaults() {
 		$cache = []; // Settings for current cacher
-		$oth = []; // You can put some custom setting here
+		$other = []; // You can put some custom setting here
 		$databases = []; // To store database settings
 		$debug = false; // Enables PinPIE::report() output. You can use it to enable your own debug mode. Globally available through PinPIE::$conf->debug.
 
@@ -143,7 +143,7 @@ class Config {
 		];
 		$arr = [];
 		$arr['cache'] = $cache;
-		$arr['oth'] = $oth; //you can use that array to store settings for your own scripts
+		$arr['other'] = $other; //you can use that array to store settings for your own scripts
 		$arr['databases'] = $databases;
 		$arr['pinpie'] = $pinpie;
 		$arr['debug'] = $debug;
@@ -157,7 +157,7 @@ class Config {
 	protected function readConfFile($path) {
 		$arr = $this->getDefaults();
 		$cache = $arr['cache'];
-		$oth = $arr['oth'];
+		$other = $arr['other'];
 		$databases = $arr['databases'];
 		$pinpie = $arr['pinpie'];
 		$debug = $arr['debug'];
@@ -170,7 +170,7 @@ class Config {
 		}
 		$arr = [];
 		$arr['cache'] = $cache;
-		$arr['oth'] = $oth;
+		$arr['other'] = $other;
 		$arr['databases'] = $databases;
 		$arr['pinpie'] = $pinpie;
 		$arr['debug'] = $debug;

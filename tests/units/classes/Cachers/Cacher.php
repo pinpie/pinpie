@@ -47,6 +47,6 @@ class Cacher extends atoum {
 
     $this
       ->string($this->testedInstance->getHash($tag))
-      ->isEqualTo('type.406cadb150a0eeb5e55a37a368e0f1b645ee8373', $this->testedInstance->getHash($tag));
+      ->isEqualTo('406cadb150a0eeb5e55a37a368e0f1b645ee8373', $this->testedInstance->getHash($tag));
   }
 }

@@ -3,13 +3,12 @@
 namespace pinpie\pinpie;
 
 class PinPIE {
-	/** @var null|PP */
-	public static $pp = null;
-	/** @var null|Config */
-	public static $conf = null;
-	/** @var null|URL */
+	/** @var null|\pinpie\pinpie\PP */
+	public static $pinpie = null;
+	/** @var null|\pinpie\pinpie\Config */
+	public static $config = null;
+	/** @var null|\pinpie\pinpie\URL */
 	public static $url = null,
-		$document = null,
 		$template = null;
 
 	/**
@@ -17,7 +16,7 @@ class PinPIE {
 	 * @return null|Cachers\Cacher
 	 */
 	public static function cacherGet() {
-		return static::$pp->cacher;
+		return static::$pinpie->cacher;
 	}
 
 	/**
@@ -26,7 +25,7 @@ class PinPIE {
 	 * @return Cachers\Cacher
 	 */
 	public static function cacherSet(Cachers\Cacher $cacher) {
-		return static::$pp->cacher = $cacher;
+		return static::$pinpie->cacher = $cacher;
 	}
 
 	/**
@@ -36,7 +35,7 @@ class PinPIE {
 	 * @return bool|string False on fail, or $path on success
 	 */
 	public static function checkPathIsInFolder($path, $folder) {
-		return static::$pp->checkPathIsInFolder($path, $folder);
+		return static::$pinpie->checkPathIsInFolder($path, $folder);
 	}
 
 	/**
@@ -45,7 +44,7 @@ class PinPIE {
 	 * @return bool|URL
 	 */
 	public function getUrlInfo($url) {
-		return static::$pp->getUrlInfo($url);
+		return static::$pinpie->getUrlInfo($url);
 	}
 
 	/**
@@ -55,8 +54,8 @@ class PinPIE {
 	public static function renderPage($settings = false) {
 		try {
 			$pp = new PP($settings);
-			static::$pp = &$pp;
-			static::$conf = &$pp->conf;
+			static::$pinpie = &$pp;
+			static::$config = &$pp->conf;
 			static::$url = &$pp->url;
 			static::$template = &$pp->template;
 			echo $pp->render();
@@ -83,7 +82,7 @@ class PinPIE {
 	 * @return String
 	 */
 	public static function parseString($string) {
-		return static::$pp->parseString($string);
+		return static::$pinpie->parseString($string);
 	}
 
 	/**
@@ -92,7 +91,7 @@ class PinPIE {
 	 * @return string
 	 */
 	public static function report() {
-		return static::$pp->report();
+		return static::$pinpie->report();
 	}
 
 	/**
@@ -101,7 +100,7 @@ class PinPIE {
 	 * @return string
 	 */
 	public static function reportTags() {
-		return static::$pp->reportTags();
+		return static::$pinpie->reportTags();
 	}
 
 	/**
@@ -109,7 +108,7 @@ class PinPIE {
 	 * @return string
 	 */
 	public static function templateGet() {
-		return static::$pp->template;
+		return static::$pinpie->template;
 	}
 
 	/**
@@ -118,7 +117,7 @@ class PinPIE {
 	 * @return mixed
 	 */
 	public static function templateSet($template) {
-		return static::$pp->template = $template;
+		return static::$pinpie->template = $template;
 	}
 
 	/**
@@ -127,7 +126,7 @@ class PinPIE {
 	 * @param string $content
 	 */
 	public static function varPut($name, $content) {
-		static::$pp->vars[$name][100000][] = $content;
+		static::$pinpie->vars[$name][100000][] = $content;
 	}
 
 	/**
@@ -136,7 +135,7 @@ class PinPIE {
 	 * @param string $content
 	 */
 	public static function varReplace($name, $content) {
-		static::$pp->vars[$name] = [
+		static::$pinpie->vars[$name] = [
 			100000 => [$content]
 		];
 	}

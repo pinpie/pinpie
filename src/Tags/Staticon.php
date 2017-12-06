@@ -264,7 +264,10 @@ class Staticon extends Tag {
 				$useminify = $this->checkAndRunMinifier();
 				$this->pinpie->times[] = [microtime(true), 'checkAndRunMinifier done'];
 			}
-			if (!$useminify) {
+			if ($useminify) {
+				// if minified path exitst - we need to change $this->filename to $this->minifiedPath because from now we will work with that path.
+				$this->filename = $this->minifiedPath;
+			}else {
 				$this->minifiedURL = false;
 			}
 			$this->c['getMinified'][$this->staticPath]['url'] = $this->minifiedURL;
