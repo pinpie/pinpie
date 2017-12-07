@@ -59,7 +59,7 @@ To cache snippet forever, just use that syntax:
 [[!$snippet]]
 ```
 
-That snippet will be cached for PHP_INT_MAX seconds, which is a lot.
+That snippet will be cached for 315360000 seconds, which is a lot.
 
 You don't need to purge cache yourself every time you change something important on the site. PinPIE will automatically recache only changed content. But anyway, you can purge the cache if you want.
 Read more in [cache readme](http://pinpie.ru/en/manual/cache).

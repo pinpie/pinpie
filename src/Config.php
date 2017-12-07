@@ -86,7 +86,7 @@ class Config {
 		//Loading defaults
 		$pinpie = [
 			'cache class' => '\pinpie\pinpie\Cachers\Files',
-			'cache forever time' => PHP_INT_MAX,
+			'cache forever time' => 315360000,
 			'cache rules' => [
 				'default' => ['ignore url' => false, 'ignore query params' => []],
 				200 => ['ignore url' => false, 'ignore query params' => []],
