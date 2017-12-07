@@ -1,4 +1,4 @@
-[![PinPIE](https://img.shields.io/badge/PHP-PinPIE-brightgreen.svg)](http://pinpie.ru/)
+[![PinPIE](https://img.shields.io/badge/PHP-PinPIE-brightgreen.svg)](http://pinpie.rocks/)
 [![Latest Stable Version](https://img.shields.io/packagist/v/pinpie/pinpie.svg)](https://packagist.org/packages/pinpie/pinpie)
 [![Build Status](http://img.shields.io/travis/pinpie/pinpie.svg)](https://travis-ci.org/pinpie/pinpie)
 [![codecov](https://codecov.io/gh/pinpie/pinpie/branch/stable/graph/badge.svg)](https://codecov.io/gh/pinpie/pinpie)
@@ -11,7 +11,7 @@
 ## About
 PinPIE is lightweight php-based engine for small sites
 
-Read more about PinPIE engine in [PinPIE docs](http://pinpie.ru)
+Read more about PinPIE engine in [PinPIE docs](http://pinpie.rocks)
 
 ## Overview
 
@@ -33,7 +33,7 @@ Basic tags are:
 - Chunks — a pieces of plain text
 - Snippets — a pieces of php code to execute
 
-Read more in [tags readme](http://pinpie.ru/en/manual/tags).
+Read more in [tags readme](http://pinpie.rocks/en/manual/tags).
 
 PinPIE provide clear and controllable automatic snippet caching.
 Caching can be enabled or disabled for each snippet tag separately.
@@ -62,9 +62,9 @@ To cache snippet forever, just use that syntax:
 That snippet will be cached for about ten years, which is a lot.
 
 You don't need to purge cache yourself every time you change something important on the site. PinPIE will automatically recache only changed content. But anyway, you can purge the cache if you want.
-Read more in [cache readme](http://pinpie.ru/en/manual/cache).
+Read more in [cache readme](http://pinpie.rocks/en/manual/cache).
 
-Read more about PinPIE engine in [PinPIE docs](http://pinpie.ru).
+Read more about PinPIE engine in [PinPIE docs](http://pinpie.rocks).
 
 
 
@@ -133,7 +133,7 @@ This behavior can be changed in config.
 
 Chunk `[[lorem/ipsum]]` is just a piece of text in a `/chunks/lorem/ipsum` folder.
 
-You can find more examples in [other PinPIE repos](https://github.com/pinpie) or at [PinPIE site](http://pinpie.ru/en/examples).
+You can find more examples in [other PinPIE repos](https://github.com/pinpie) or at [PinPIE site](http://pinpie.rocks/en/examples).
 
 ## Start using PinPIE
 You can install PinPIE with composer:
@@ -145,7 +145,7 @@ composer install
 
 Or download code from GitHub and use standalone autoloader file `/pinpie/src/autoload.php`.
 
-You can find more detailed instructions in [start unsing PinPIE](http://pinpie.ru/en/manual/start) docs.
+You can find more detailed instructions in [start unsing PinPIE](http://pinpie.rocks/en/manual/start) docs.
 
 
 
