@@ -19,8 +19,7 @@
     "php": ">=5.4",
     "atoum/atoum": "^3.2",
     "atoum/stubs": "^2.5",
-    "atoum/reports-extension": "^3.0",
-    "atoum/telemetry-extension": "^1.0"
+    "telemetry-extension": "^1.0"
   },
   "autoload": {
     "psr-4": {

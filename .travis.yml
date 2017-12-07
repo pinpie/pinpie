@@ -13,7 +13,7 @@ before_script:
   #- echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - phpenv config-add tests/apc.ini
   # No xml report for PHP 5.4
-  - if [[ "$(php -v | grep 'PHP 5.4')" ]]; then composer remove atoum/reports-extension; fi
+  #- if [[ "$(php -v | grep 'PHP 5.4')" ]]; then composer remove atoum/reports-extension; fi
   # composer
   - composer self-update
   - composer install --prefer-source --no-interaction --dev
